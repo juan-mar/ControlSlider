@@ -24,7 +24,7 @@ void setup(){
 
 void loop() {
 	Serial.println("Hola Mundo");
-	delay(10*1000);
+	delay(1*1000);
 
 	if(!EG_isEmpty()){
 		while (EG_numberOfElements()){
