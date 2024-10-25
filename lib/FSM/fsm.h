@@ -1,11 +1,12 @@
-#ifndef EVENTGENERATOR_EVENTGENERATOR_H_
-#define EVENTGENERATOR_EVENTGENERATOR_H_
+#ifndef FSM_H_
+#define FSM_H_
+
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include <stdbool.h>
-#include <stdint.h>
+
+#include "fsmTable.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -15,40 +16,21 @@
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef enum{
-    RIGHT,
-    LEFT,
-    ENTER,
-    INIT_OF_LINE,
-    END_OF_LINE,
-    RIGHT_LONG = 10,
-    LEFT_LONG,
-    ENTER_LONG,
-    INIT_OF_LINE_LONG,
-    END_OF_LINE_LONG,
-    DEFAULT = 0XFE,
-    NONE = 0xFF
-}events_t;
+
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
 
-
-
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-void EG_init(void);
 
-events_t EG_getEvent(void);
-
-bool EG_isEmpty(void);
-
-uint8_t EG_numberOfElements(void);
-
+state_t fsm(state_t state, byte_t event);
 
 /*******************************************************************************
  ******************************************************************************/
-#endif /* EVENTGENERATOR_EVENTGENERATOR_H_ */
+
+
+#endif /* FSM_H_ */

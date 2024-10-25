@@ -1,54 +1,44 @@
-#ifndef EVENTGENERATOR_EVENTGENERATOR_H_
-#define EVENTGENERATOR_EVENTGENERATOR_H_
+#ifndef FSMTABLE_H_
+#define FSMTABLE_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include <stdbool.h>
+#include "EventGenerator.h"
 #include <stdint.h>
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef enum{
-    RIGHT,
-    LEFT,
-    ENTER,
-    INIT_OF_LINE,
-    END_OF_LINE,
-    RIGHT_LONG = 10,
-    LEFT_LONG,
-    ENTER_LONG,
-    INIT_OF_LINE_LONG,
-    END_OF_LINE_LONG,
-    DEFAULT = 0XFE,
-    NONE = 0xFF
-}events_t;
+
+typedef	unsigned char byte_t;
+
+typedef struct state_edge_s state_edge_t;
+
+struct state_edge_s{
+	byte_t event;
+	state_edge_t* nextState;
+	void (*actionPtr)(void);
+};
+
+typedef state_edge_t* state_t;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
-
-
-
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-void EG_init(void);
 
-events_t EG_getEvent(void);
-
-bool EG_isEmpty(void);
-
-uint8_t EG_numberOfElements(void);
-
+state_t FSM_GetInitState(void);
 
 /*******************************************************************************
  ******************************************************************************/
-#endif /* EVENTGENERATOR_EVENTGENERATOR_H_ */
+
+
+#endif /* FSMTABLE_H_ */
