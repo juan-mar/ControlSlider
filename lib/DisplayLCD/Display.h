@@ -22,21 +22,20 @@
 #define FIL     2
 #define COL     16
 
-#define IZQ     0
-#define DER     1
-#define ARRIBA  0
-#define ABAJO   1
+//definiciones generales
+#define CURSOR      ">"
+#define BLANK       "                "
+#define COL0        0
+#define FILA0       0
+#define FILA1       1
 
-#define CURSOR  ">"
-#define BLANK   "                "
-#define ORIGEN  0,0
-#define FILA1   0,1
+
 
 //PANTALLA DE INICIO
 #define TITLE       "Camera Slider   "
 #define LINE1       " Run   Settings "           
 #define LINE2       " Continue    End"
-#define OFFSET_RUN_CONT     0
+
 #define OFFSET_SETTINGS     7
 #define OFFSET_END          12 
 
@@ -51,24 +50,34 @@
 #define PARTS       " Part           "
 #define ADD_DEL     " Add         Del"
 
-#define OFFSET_ADD  FILA1
 #define OFFSET_DEL  12
 
 //PART SETTINGS
 #define POSITIONS   " Xo:    Xf:    B"
 #define TIME_VEL    " T:   s V:   m/s"
 
-#define OFFSET_TV   FILA1
+#define OFFSET_XF   7
+#define OFFSET_B    15
+#define OFFSET_VEL  7
 
 //RUNNING
 #define RUN         "Running...      "
+#define PAUSE       " Pause          "
+
+#define OFFSET_PER  12  //para poner el porcentaje si se desea
 
        
 /*******************************************************************************
  * DEFINICION DE FUNCIONES
  ******************************************************************************/
+//Funcion de inicializacion del display. Muestra pantalla de inicio con el cursor en Run
 void InitDisp();
-void SetCur(bool x, bool y);
+
+//Funcion que muestra una pantalla predeterminada
+void show_screen(char * fila1, char * fila2);
+
+//Funcion que posiciona el cursor en determinada ubicacion. Primero lo borra de la ubicacion anterior
+void show_curs(int col, int fil);
 
 
 
