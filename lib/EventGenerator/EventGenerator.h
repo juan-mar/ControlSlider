@@ -16,17 +16,13 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 typedef enum{
-    RIGHT,
+    RIGH,
     LEFT,
+    UP,
+    DOWN,
     ENTER,
     INIT_OF_LINE,
     END_OF_LINE,
-    RIGHT_LONG = 10,
-    LEFT_LONG,
-    ENTER_LONG,
-    INIT_OF_LINE_LONG,
-    END_OF_LINE_LONG,
-    DEFAULT = 0XFE,
     NONE = 0xFF
 }events_t;
 
@@ -43,6 +39,8 @@ typedef enum{
 void EG_init(void);
 
 events_t EG_getEvent(void);
+
+void EG_setEvent(events_t);
 
 bool EG_isEmpty(void);
 

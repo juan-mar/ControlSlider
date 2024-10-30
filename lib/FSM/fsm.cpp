@@ -37,7 +37,7 @@
 state_t fsm(state_t state, byte_t event) {
 
 	//Recorre las tablas de estado
-   	while (state -> event != event && state -> event != DEFAULT)
+   	while (state -> event != event && state -> event != NONE)
    		++state;
 
 	(state->actionPtr)();          /*rutina de accion corresondiente*/

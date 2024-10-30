@@ -23,6 +23,7 @@ struct state_edge_s{
 	byte_t event;
 	state_edge_t* nextState;
 	void (*actionPtr)(void);
+	void (*actionState)(void);
 };
 
 typedef state_edge_t* state_t;
