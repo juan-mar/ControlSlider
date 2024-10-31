@@ -72,9 +72,13 @@ void EG_init(void){
 
 }
 
+
 events_t EG_getEvent(void){
-	//return colaPull(&event_queue);
 	return (events_t)eventBuffer.pop();
+}
+
+void EG_addExternEvent(events_t event){
+	eventBuffer.push(event);
 }
 
 bool EG_isEmpty(void){
