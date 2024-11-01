@@ -7,6 +7,10 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
+#define FILA_0 0
+#define FILA_1 1
+#define COL_0 0
+#define COL_1 1
 
 
 /*******************************************************************************
@@ -48,11 +52,11 @@ void InitDisp()
 {
     display.begin(COL, FIL);
     display.clear();
-    show_screen(TITLE, LINE1);
-    display.setCursor(COL0, FILA1);
+    show_screen(BLANK, BLANK);
+    display.setCursor(COL_0, FILA_0);
     display.print(CURSOR);
-    selector.fila = FILA1;
-    selector.columna = COL0;
+    selector.fila = 0;
+    selector.columna = 0;
     return;
 }
 
@@ -67,12 +71,12 @@ void show_curs(int col, int fil)
     return;
 }
 
-void show_screen(char * fila1, char * fila2)
+void show_screen(const char * fila1, const char * fila2)
 {
     display.clear();
-    display.setCursor(COL0, FILA0);
+    display.setCursor(COL_0, FILA_0);
     display.print(fila1);
-    display.setCursor(COL0, FILA1);
+    display.setCursor(COL_0, FILA_1);
     display.print(fila2);
     return;
 }
