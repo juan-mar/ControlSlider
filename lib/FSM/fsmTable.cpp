@@ -4,6 +4,8 @@
 #include "fsmTable.h"
 #include "Display.h"
 #include "screen.h"
+#include "EventGenerator.h"
+#include "slider.h"
 
 /*******************************************************************************
  * Foward declarations States
@@ -16,6 +18,7 @@ extern state_edge_t run[];
 
 extern state_edge_t bluetooth[];
 extern state_edge_t set_manually[];
+extern state_edge_t set_part_to_edit[];
 
 extern state_edge_t edit_parts[];
 
@@ -84,8 +87,11 @@ static void show_settings(void);
 static void show_bluetooth(void);
 static void show_set_manually(void);
 static void show_part_n(void);
-static void show_add_part(void);
-static void show_delete_part(void);
+static void show_edit_part(void);
+static void show_select_dis(void);
+static void show_select_delta_t(void);
+
+
 
 //Items selector
 static void nextItem(void);
@@ -95,6 +101,12 @@ static void selectItem(void);
 //Settings FUNCTIONS
 static void activeBluetooth(void);
 
+//set manually and Selec part to edit
+static void nextPart(void);
+static void prevPart(void);
+static void selectPart(void);
+static void add_part(void);
+static void delete_part(void);
 
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
@@ -115,7 +127,7 @@ state_edge_t menu[] = {
     //Eventos de EventGenerator
 	{ENCODER_RIGHT, menu, nextItem, show_menu},
     {ENCODER_LEFT, menu, prevItem, show_menu},
-	{ENCODER_SWITCH, menu, selectItem, show_run},
+	{ENCODER_SWITCH, menu, selectItem, show_menu},
     
 	{INIT_OF_LINE, menu, do_nothing, show_menu},
     {END_OF_LINE, menu, do_nothing, show_menu},
@@ -159,21 +171,33 @@ state_edge_t set_manually[] = {
 	{END_OF_LINE, set_manually, do_nothing, show_set_manually},
 
 	//Eventos de transiscion
-	{EDIT_PARTS, edit_parts, do_nothing, show_part_n},
+	{EDIT_PARTS, set_part_to_edit, do_nothing, show_part_n},
 	{ADD_PART, set_manually, do_nothing, show_set_manually},
 	{DELETE_PART, set_manually, do_nothing, show_set_manually},
 
 	{NONE, estado_init, do_nothing, do_nothing}
 };
 
+state_edge_t set_part_to_edit[] = {
+	//Eventos de EventGenerator
+	{ENCODER_RIGHT, set_part_to_edit, nextPart, show_part_n},
+	{ENCODER_LEFT, set_part_to_edit, prevPart, show_part_n},	
+	{ENCODER_SWITCH, edit_parts, do_nothing, do_nothing},
+
+	{INIT_OF_LINE, set_part_to_edit, do_nothing, do_nothing},
+	{END_OF_LINE, set_part_to_edit, do_nothing, do_nothing},
+
+	{NONE, estado_init, do_nothing, do_nothing}
+};
+
 state_edge_t edit_parts[] = {
     //Eventos de EventGenerator
-	{ENCODER_RIGHT, edit_parts, nextItem, show_part_n},
-	{ENCODER_LEFT, edit_parts, prevItem, show_part_n},
-	{ENCODER_SWITCH, edit_parts, selectItem, show_part_n},
+	{ENCODER_RIGHT, edit_parts, nextItem, show_edit_part},
+	{ENCODER_LEFT, edit_parts, prevItem, show_edit_part},
+	{ENCODER_SWITCH, edit_parts, selectItem, show_edit_part},
 
-	{INIT_OF_LINE, edit_parts, do_nothing, show_set_manually},
-	{END_OF_LINE, edit_parts, do_nothing, show_set_manually},
+	{INIT_OF_LINE, edit_parts, do_nothing, show_edit_part},
+	{END_OF_LINE, edit_parts, do_nothing, show_edit_part},
 
 	//Eventos de transiscion
 	{SELEC_DIS, selec_distances, do_nothing, do_nothing},
@@ -310,7 +334,10 @@ static menu_items_t selec_numbers = {{{0, DIGIT_0, DIGIT_0_COL, DIGIT_0_FIL},
 									{4, OK_, OK_COL, OK_FIL}},
 									0, 5};
 
-static uint8_t listOfOptions[4] = {0, 1, 2, 3};
+static uint8_t part_to_edit = 0;
+
+//Objet Slider
+static Slider slider;
 
 /*******************************************************************************
  *******************************************************************************
@@ -358,7 +385,6 @@ static void selectItem(void){
  ******************************************************************************/
 static void show_menu(void){
 	currentStateItem = &main_menu_items;
-	//show_screen(currentStateItem->item[currentStateItem->item_selec].name, BLANK);
 	show_screen(MENU_TITLE, MENU_LINE1);
 	
 }
@@ -367,19 +393,6 @@ static void show_menu(void){
 /*******************************************************************************
  * 						Setting FUNCTIONS
  ******************************************************************************/
-static void activeBluetooth(void){
-
-}
-
-
-//---------------------Copilot functions---------------------
-
-
-static void show_run(void) {
-	currentStateItem = &run_items;
-	show_screen(RUN, PAUSE_FINISH);	
-}
-
 static void show_settings(void) {
 	currentStateItem = &setting_items;
 	show_screen(BT_OFF, SET_MAN);
@@ -397,18 +410,81 @@ static void show_bluetooth(void) {
 	}
 }
 
+static void activeBluetooth(void){
+
+}
+
+/*******************************************************************************
+ * 						Run FUNCTIONS
+ ******************************************************************************/
+static void show_run(void) {
+	currentStateItem = &run_items;
+	show_screen(RUN, PAUSE_FINISH);	
+}
+
+/*******************************************************************************
+ * 						Set Manually FUNCTIONS
+ ******************************************************************************/
 static void show_set_manually(void) {
 	currentStateItem = &set_manually_items;
 	show_screen(PARTS, ADD_DEL);
 }
 
-
-
+//TODO: Implementar las funciones de de partes
 static void show_part_n(void) {
+	show_screen(BLANK, ADD_DEL);
+	show_curs(SEL_PART_COL, SEL_PART_FIL);
 }
 
-static void show_add_part(void) {
+static void nextPart(void) {
+	part_to_edit++;
+	if(part_to_edit >= slider.numTramos){
+		part_to_edit = 0;
+	}
+	show_part_n();
 }
 
-static void show_delete_part(void) {
+static void prevPart(void) {
+	if(part_to_edit == 0){
+		part_to_edit = slider.numTramos - 1;
+	}
+	else{
+		part_to_edit--;
+	}
+	show_part_n();
 }
+
+static void add_part(void) {
+	slider.agregarTramo( slider.getX0(slider.numTramos-1),slider.getX0(slider.numTramos-1)+1);
+}
+
+static void delete_part(void) {
+	slider.borrarUltimoTramo();
+}
+
+/*******************************************************************************
+ * 						edit part n FUNCTIONS
+ ******************************************************************************/
+static void show_edit_part(void) {
+	currentStateItem = &edit_parts_items;
+	show_screen(POSITIONS, TIME_VEL);
+}
+
+/*******************************************************************************
+ * 						selec distances FUNCTIONS
+ ******************************************************************************/
+//TODO: Implementar las funciones de seleccion de distancias
+static void show_select_dis(void) {
+	currentStateItem = &selec_dis_items;
+	show_screen(BLANK, BLANK);
+}	
+
+
+/*******************************************************************************
+ * 						selec delta T FUNCTIONS
+ ******************************************************************************/
+//TODO: Implementar las funciones de seleccion de delta T
+static void show_select_delta_t(void) {
+	currentStateItem = &selec_numbers;
+	show_screen(BLANK, BLANK);
+}	

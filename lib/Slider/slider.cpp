@@ -33,3 +33,7 @@ void Slider::modificarTramo(int tramo, double x0, double xf, double tiempo){
     distanciasTramos[tramo][1] = xf;
     tiemposTramos[tramo] = tiempo;
 }
+
+double Slider::getX0(int tramo){
+    return distanciasTramos[tramo][0];
+}

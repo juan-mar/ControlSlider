@@ -21,7 +21,7 @@ public:
     void borrarTramo(int tramo);
     void borrarUltimoTramo();
     void modificarTramo(int tramo, double x0, double xf, double tiempo = 10);
-
+    double getX0(int tramo);
 
 private:
     std::vector<std::array<double, 2>> distanciasTramos;

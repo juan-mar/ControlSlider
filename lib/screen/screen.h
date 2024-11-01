@@ -23,6 +23,8 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define BACK_FIL        2
 #define EDIT_PARTS_COL  0
 #define EDIT_PARTS_FIL  0
+#define SEL_PART_COL    1
+#define SEL_PART_FIL    0
 #define ADD_PART_COL    1
 #define ADD_PART_FIL    1
 #define DEL_COL         2
