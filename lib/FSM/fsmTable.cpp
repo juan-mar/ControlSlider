@@ -19,8 +19,7 @@ extern state_edge_t set_manually[];
 
 extern state_edge_t edit_parts[];
 
-extern state_edge_t selec_x0[];
-extern state_edge_t selec_xf[];
+extern state_edge_t selec_distances[];
 extern state_edge_t selec_delta_t[];
 extern state_edge_t selec_vel[];
 
@@ -35,10 +34,18 @@ enum eventos{
 	EDIT_PARTS,
 	ADD_PART,
 	DELETE_PART,
-	SELEC_X0,
-	SELEC_XF,
+	SELEC_DIS,
 	SELEC_DELTA_T,
 	SELEC_VEL,
+	X0,
+	XF,
+	RIGH,
+	LEFT,
+	OK,
+	DIGIT_0,
+	DIGIT_1,
+	DIGIT_2,
+	DIGIT_3,
 	BACK
 };
 
@@ -57,7 +64,7 @@ enum posiciones{
 typedef struct{
 	uint8_t item_numer;
 	uint8_t item_event_select;
-	char* name;
+	const char* name;
 	uint8_t len_name;
 }item_t;
 
@@ -175,8 +182,7 @@ state_edge_t edit_parts[] = {
 	{END_OF_LINE, edit_parts, do_nothing, show_set_manually},
 
 	//Eventos de transiscion
-	{SELEC_X0, selec_x0, do_nothing, do_nothing},
-	{SELEC_XF, selec_xf, do_nothing, do_nothing},
+	{SELEC_DIS, selec_distances, do_nothing, do_nothing},
 	{SELEC_DELTA_T, selec_delta_t, do_nothing, do_nothing},
 	{SELEC_VEL, selec_vel, do_nothing, do_nothing},
 	
@@ -184,23 +190,60 @@ state_edge_t edit_parts[] = {
     {NONE, estado_init, do_nothing, do_nothing}
 };
 
-//TODO: Implementar los estados de seleccion de valores
-state_edge_t selec_x0[] = {
+state_edge_t selec_distances[] = {
+	//eventos de EventGenerator
+	{ENCODER_RIGHT, selec_distances, nextItem, show_part_n},
+	{ENCODER_LEFT, selec_distances, prevItem, show_part_n},
+	{ENCODER_SWITCH, selec_distances, selectItem, show_part_n},
 
-	{NONE, estado_init, do_nothing, do_nothing}
-};
+	{INIT_OF_LINE, selec_distances, do_nothing, show_part_n},
+	{END_OF_LINE, selec_distances, do_nothing, show_part_n},
 
-state_edge_t selec_xf[] = {
+	//Eventos de transiscion
+	{X0, selec_distances, do_nothing, do_nothing},
+	{XF, selec_distances, do_nothing, do_nothing},
+	{RIGH, selec_distances, do_nothing, do_nothing},	
+	{LEFT, selec_distances, do_nothing, do_nothing},
+	{OK, edit_parts, do_nothing, do_nothing},
 
 	{NONE, estado_init, do_nothing, do_nothing}
 };
 
 state_edge_t selec_delta_t[] = {
+	//eventos de EventGenerator
+	{ENCODER_RIGHT, selec_delta_t, nextItem, show_part_n},
+	{ENCODER_LEFT, selec_delta_t, prevItem, show_part_n},
+	{ENCODER_SWITCH, selec_delta_t, selectItem, show_part_n},
+
+	{INIT_OF_LINE, selec_delta_t, do_nothing, show_part_n},
+	{END_OF_LINE, selec_delta_t, do_nothing, show_part_n},
+
+	//Eventos de transiscion
+	{DIGIT_0, selec_delta_t, do_nothing, do_nothing},
+	{DIGIT_1, selec_delta_t, do_nothing, do_nothing},
+	{DIGIT_2, selec_delta_t, do_nothing, do_nothing},
+	{DIGIT_3, selec_delta_t, do_nothing, do_nothing},
+	{OK, edit_parts, do_nothing, do_nothing},
 
 	{NONE, estado_init, do_nothing, do_nothing}
 };
 
 state_edge_t selec_vel[] = {
+
+	//eventos de EventGenerator
+	{ENCODER_RIGHT, selec_vel, nextItem, show_part_n},
+	{ENCODER_LEFT, selec_vel, prevItem, show_part_n},
+	{ENCODER_SWITCH, selec_vel, selectItem, show_part_n},
+
+	{INIT_OF_LINE, selec_vel, do_nothing, show_part_n},
+	{END_OF_LINE, selec_vel, do_nothing, show_part_n},
+
+	//Eventos de transiscion
+	{DIGIT_0, selec_vel, do_nothing, do_nothing},
+	{DIGIT_1, selec_vel, do_nothing, do_nothing},
+	{DIGIT_2, selec_vel, do_nothing, do_nothing},
+	{DIGIT_3, selec_vel, do_nothing, do_nothing},
+	{OK, edit_parts, do_nothing, do_nothing},
 
 	{NONE, estado_init, do_nothing, do_nothing}
 };
@@ -208,7 +251,16 @@ state_edge_t selec_vel[] = {
 
 //TODO: Implementar los estados de run
 state_edge_t run[] = {
-    {ENCODER_SWITCH, menu, do_nothing, show_menu},
+    //Eventos de EventGenerator
+	{ENCODER_RIGHT, run, nextItem, show_run},
+    {ENCODER_LEFT, run, prevItem, show_run},
+	{ENCODER_SWITCH, run, selectItem, show_run},
+    
+	{INIT_OF_LINE, run, do_nothing, show_run},
+    {END_OF_LINE, run, do_nothing, show_run},
+
+	
+
     {NONE, estado_init, do_nothing, do_nothing}
 };
 
@@ -234,13 +286,25 @@ static menu_items_t set_manually_items = {{{0, EDIT_PARTS, "Edit parts", 9},
 										  {3, BACK, "Back", 11}}, 
 										  0, 4};
 
-static menu_items_t edit_parts_items = {{{0, SELEC_X0, "Select X0", 9},
-										  {1, SELEC_XF, "Select Xf", 9},
-										  {2, SELEC_DELTA_T, "Time", 4},
-										  {3, SELEC_VEL, "Velocity", 8},
-										  {4, BACK, "Back", 4}},
-										  0, 5};
+static menu_items_t edit_parts_items = {{{0, SELEC_DIS, "Select X0", 9},
+										  {1, SELEC_DELTA_T, "Time", 4},
+										  {2, SELEC_VEL, "Velocity", 8},
+										  {3, BACK, "Back", 4}},
+										  0, 4};
 
+static menu_items_t selec_dis_items = {{{0, X0, "X0", 2},
+									  	{1, XF, "Xf", 2},
+										{2, LEFT, "Left", 4},
+									  	{3, RIGH, "Right", 4},
+									  	{4, OK, "Ok", 2},},
+									  	0, 5};
+
+static menu_items_t selec_numbers = {{{0, DIGIT_0, "0", 1},
+											{1, DIGIT_1, "1", 1},
+											{2, DIGIT_2, "2", 1},
+											{3, DIGIT_3, "3", 1},
+											{4, OK, "Ok", 2}},
+											0, 5};
 
 /*******************************************************************************
  *******************************************************************************
@@ -259,16 +323,16 @@ state_t FSM_GetInitState(void) {
 static void do_nothing(){}
 
 /*******************************************************************************
- * 						MENU FUNCTIONS
+ * 						ITEMS FUNCTIONS
  ******************************************************************************/
-static void nextMenuItem(void){
+static void nextItem(void){
 	currentStateItem->item_selec++;
 	if(currentStateItem->item_selec >= currentStateItem->item_cant){
 		currentStateItem->item_selec = 0;
 	}
 }
 
-static void prevMenuItem(void){
+static void prevItem(void){
 	if(currentStateItem->item_selec == 0){
 		currentStateItem->item_selec = currentStateItem->item_cant - 1;
 	}
@@ -277,19 +341,29 @@ static void prevMenuItem(void){
 	}
 }
 
-static void selectMenuItem(void){
+static void selectItem(void){
 	EG_addExternEvent((events_t)(currentStateItem->item[currentStateItem->item_selec].item_event_select));
 }
 
 /*******************************************************************************
+ * 						menu FUNCTIONS
+ ******************************************************************************/
+static void show_menu(void){
+	currentStateItem = &main_menu_items;
+	//show_screen(currentStateItem->item[currentStateItem->item_selec].name, BLANK);
+}
+
+
+/*******************************************************************************
  * 						Setting FUNCTIONS
  ******************************************************************************/
+static void activeBluetooth(void){
+
+}
 
 
 //---------------------Copilot functions---------------------
-static void show_menu(void) {
-   
-}
+
 
 static void show_run(void) {
 }
