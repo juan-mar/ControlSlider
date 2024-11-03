@@ -1,5 +1,11 @@
-#ifndef EVENTGENERATOR_EVENTGENERATOR_H_
-#define EVENTGENERATOR_EVENTGENERATOR_H_
+/***************************************************************************//**
+  @file     encoder_app.h
+  @brief    Encoder analysis app
+  @author   
+ ******************************************************************************/
+
+#ifndef _ENCODER_APP_H_
+#define _ENCODER_APP_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
@@ -11,40 +17,17 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef enum{
-    ENCODER_RIGHT,
-    ENCODER_LEFT,
-    ENCODER_SWITCH,
-    INIT_OF_LINE, 
-    END_OF_LINE,
-    NONE = 0xFF
-}events_t;
-
+ enum status{KEEP_WRITING, DONE_WRITING, MISTAKE_WRITING, RELOAD_WRITING};
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
-
-
-
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-void EG_init(void);
+int encoder_num (int press_button, int* reg);
 
-events_t EG_getEvent(void);
-
-void EG_addExternEvent(events_t);
-
-bool EG_isEmpty(void);
-
-uint8_t EG_numberOfElements(void);
-
-
-/*******************************************************************************
- ******************************************************************************/
-#endif /* EVENTGENERATOR_EVENTGENERATOR_H_ */
+#endif // _ENCODER_APP_H_

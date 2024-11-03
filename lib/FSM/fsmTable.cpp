@@ -113,12 +113,12 @@ static void delete_part(void);
  ******************************************************************************/
 
 state_edge_t estado_init[] = {
-	{ENCODER_RIGHT, menu, show_menu, show_menu},
-    {ENCODER_LEFT, menu, show_menu, show_menu},
-	{ENCODER_SWITCH, menu, show_menu, show_run},
+	{ENCODER_RIGHT, menu, show_menu, do_nothing},
+    {ENCODER_LEFT, menu, show_menu, do_nothing},
+	{ENCODER_SWITCH, menu, show_menu, do_nothing},
     
-	{INIT_OF_LINE, menu, show_menu, show_menu},
-    {END_OF_LINE, menu, show_menu, show_menu},
+	{INIT_OF_LINE, menu, show_menu, do_nothing},
+    {END_OF_LINE, menu, show_menu, do_nothing},
 
     {NONE, menu, show_menu, do_nothing}
 };

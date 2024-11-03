@@ -64,6 +64,11 @@ static hw_timer_t *Timer0_Cfg = NULL;
  *******************************************************************************
  ******************************************************************************/
 void EG_init(void){
+	pinMode(PIN_RIGHT_BUTTON, INPUT);
+	pinMode(PIN_LEFT_BUTTON, INPUT);
+	pinMode(PIN_ENTER_BUTTON, INPUT);
+	pinMode(PIN_START_LINE, INPUT);
+	pinMode(PIN_END_LINE, INPUT);
 	Timer0_Cfg = timerBegin(0, CLK/FREQ, true); //TIMER_0, PRESCALES=80, COUNT_UP=TRUE
   	timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true); //TIMER_0, CALL_BACK, MODE_EDGE=TRUE
   	timerAlarmWrite(Timer0_Cfg, TIME_2_TICKS(TIME_EVENT_INTERRUPT), true); //TIMER_0, N_TICKS, RELOAD=TRUE
