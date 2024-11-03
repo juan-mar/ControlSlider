@@ -13,15 +13,19 @@
 /*******************************************************************************
  * CONEXION DE SENSORES
  ******************************************************************************/
-#define PIN_ENCODER_A         4
-#define PIN_ENCODER_B         5
-#define PIN_ENCODER_SW        9
+#define PIN_ENCODER_A         22
+#define PIN_ENCODER_B         23
+#define PIN_ENCODER_SW        19
 
 /*******************************************************************************
  * CONEXION DE DISPLAY
  ******************************************************************************/
-#define PIN_LCD_SDA 0 
-#define PIN_LCD_SCL 0
+#define PIN_LCD_RS 32
+#define PIN_LCD_EN 33
+#define PIN_LCD_D4 27
+#define PIN_LCD_D5 14
+#define PIN_LCD_D6 25
+#define PIN_LCD_D7 13
 
 
 

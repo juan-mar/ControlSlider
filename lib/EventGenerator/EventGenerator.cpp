@@ -4,6 +4,7 @@
 #include "EventGenerator.h"
 #include "Arduino.h"
 #include "CircularBuffer.hpp"
+#include "ESP32Encoder.h"
 #include "Button.h"
 #include "board.h"
 #include <stdint.h>

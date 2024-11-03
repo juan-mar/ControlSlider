@@ -2,7 +2,7 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 #include "Display.h"
-
+#include "board.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -16,6 +16,12 @@
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
+#define EN      PIN_LCD_EN
+#define RS      PIN_LCD_RS
+#define D4      PIN_LCD_D4
+#define D5      PIN_LCD_D5
+#define D6      PIN_LCD_D6
+#define D7      PIN_LCD_D7
 
 typedef struct{
     int fila;
