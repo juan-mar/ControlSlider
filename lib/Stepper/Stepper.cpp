@@ -13,12 +13,19 @@
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
- static DRV8825 stepper(MOTOR_STEPS, DIR, STEP, SLEEP, MODE0, MODE1, MODE2);
+ //static DRV8825 stepper(MOTOR_STEPS, DIR, STEP, SLEEP, MODE0, MODE1, MODE2);
+
+typedef struct{
+    int microsteps;
+    int vel;
+    bool dir;
+}motor_t;
+
 
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
  ******************************************************************************/
-
+motor_t stepper;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
@@ -43,14 +50,31 @@
  ******************************************************************************/
 void InitMotor()
 {
-    stepper.begin(RPM, MICROSTEPS);     //checkear
-    //stepper.enable();             creo que no hace falta
+    stepper.microsteps = MICROSTEPS;
+    stepper.dir = HORARIO;
+    stepper.vel = 0;
     return;
 }
 
-void setMove(int vel, bool sentido)
+int calcSpeed(int x_o, int x_f, float time)
 {
-    stepper.begin(vel, MICROSTEPS);
+    int speed;
+    if(time)
+    {
+    speed = (x_f - x_o)/time;
+    }
+    else
+    {
+    speed = 0;
+    }
+    return speed;
+}
+
+void setMove(float time, bool dir, int dist)
+{
+    digitalWrite(DIR, dir);
+    digitalWrite(STEP, HIGH);
+    stepper.dir = dir;
     return;
 }
 
