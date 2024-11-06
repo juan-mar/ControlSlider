@@ -1,5 +1,6 @@
 
 #include "slider.h"
+#include "Stepper.h"
 
 Slider::Slider(){
 
@@ -36,4 +37,12 @@ void Slider::modificarTramo(int tramo, double x0, double xf, double tiempo){
 
 double Slider::getX0(int tramo){
     return distanciasTramos[tramo][0];
+}
+
+double Slider::getXf(int tramo){
+    return distanciasTramos[tramo][1];
+}
+
+double Slider::getTiempo(int tramo){
+    return tiemposTramos[tramo];
 }

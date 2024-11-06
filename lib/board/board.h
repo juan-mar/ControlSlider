@@ -4,11 +4,9 @@
 /*******************************************************************************
  * CONEXION DE BOTONES
  ******************************************************************************/
-#define PIN_RIGHT_BUTTON    3
-#define PIN_LEFT_BUTTON     19
-#define PIN_ENTER_BUTTON    4
 #define PIN_START_LINE      6
 #define PIN_END_LINE        7
+
 
 /*******************************************************************************
  * CONEXION DE SENSORES

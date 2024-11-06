@@ -108,6 +108,8 @@ static void selectPart(void);
 static void add_part(void);
 static void delete_part(void);
 
+static void run_slider(void);
+
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -272,20 +274,20 @@ state_edge_t selec_vel[] = {
 //TODO: Implementar los estados de run
 state_edge_t run[] = {
     //Eventos de EventGenerator
-	{ENCODER_RIGHT, run, nextItem, show_run},
-    {ENCODER_LEFT, run, prevItem, show_run},
-	{ENCODER_SWITCH, run, selectItem, show_run},
+	{ENCODER_RIGHT, run, nextItem, run_slider},
+    {ENCODER_LEFT, run, prevItem, run_slider},
+	{ENCODER_SWITCH, run, selectItem, run_slider},
     
-	{INIT_OF_LINE, run, do_nothing, show_run},
-    {END_OF_LINE, run, do_nothing, show_run},
+	{INIT_OF_LINE, run, do_nothing, run_slider},
+    {END_OF_LINE, run, do_nothing, run_slider},
 
 	//Eventos de transiscion
-	{PAUSE_, run, do_nothing, do_nothing},
-	{FINISH, run, do_nothing, do_nothing},
-	{BACK, menu, do_nothing, do_nothing},
+	{PAUSE_, run, do_nothing, run_slider},
+	{FINISH, run, do_nothing, run_slider},
+	{BACK, menu, do_nothing, run_slider},
 
 
-    {NONE, estado_init, do_nothing, do_nothing}
+    {NONE, estado_init, do_nothing, run_slider}
 };
 
 
@@ -488,3 +490,15 @@ static void show_select_delta_t(void) {
 	currentStateItem = &selec_numbers;
 	show_screen(BLANK, BLANK);
 }	
+
+/*******************************************************************************
+ * 						run FUNCTIONS
+ ******************************************************************************/
+static void run_slider(void){
+				
+	
+
+
+
+
+}

@@ -24,6 +24,7 @@
 #define LONG_PUSH_TIME	(3.0) //s
 #define LONG_PUSH_TICK	((uint32_t)(LONG_PUSH_TIME/TIME_EVENT_INTERRUPT))
 
+#define MAX_BUTTONS 3
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -35,8 +36,8 @@
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
-static void new_mov_event(void);
-static void new_enter_event(void);
+static void readEncoder(void);
+static void readButtons(void);
 static void IRAM_ATTR Timer0_ISR(void);
 
 /*******************************************************************************
@@ -48,16 +49,12 @@ static void IRAM_ATTR Timer0_ISR(void);
  * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
 static CircularBuffer <uint8_t, MAX_EVENT> eventBuffer;
-static Button botonDerecha = Button(PIN_RIGHT_BUTTON, ACT_HIGH);
-static Button botonIzquierda = Button(PIN_LEFT_BUTTON, ACT_HIGH);
-static Button botonEnter = Button(PIN_ENTER_BUTTON, ACT_HIGH);
+static Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_HIGH);
 static Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
 static Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
-static Button * listButton[5] = {&botonDerecha,&botonIzquierda,&botonEnter,
-									&inicioDeLinea,&finDeLinea};
-static uint32_t countButtonTicks[5] = {0};
 static hw_timer_t *Timer0_Cfg = NULL;
 
+static ESP32Encoder encoder;
 
 /*******************************************************************************
  *******************************************************************************
@@ -65,11 +62,11 @@ static hw_timer_t *Timer0_Cfg = NULL;
  *******************************************************************************
  ******************************************************************************/
 void EG_init(void){
-	pinMode(PIN_RIGHT_BUTTON, INPUT);
-	pinMode(PIN_LEFT_BUTTON, INPUT);
-	pinMode(PIN_ENTER_BUTTON, INPUT);
-	pinMode(PIN_START_LINE, INPUT);
-	pinMode(PIN_END_LINE, INPUT);
+	//Encoder Setup
+	encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
+	encoder.setCount(0);
+
+
 	Timer0_Cfg = timerBegin(0, CLK/FREQ, true); //TIMER_0, PRESCALES=80, COUNT_UP=TRUE
   	timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true); //TIMER_0, CALL_BACK, MODE_EDGE=TRUE
   	timerAlarmWrite(Timer0_Cfg, TIME_2_TICKS(TIME_EVENT_INTERRUPT), true); //TIMER_0, N_TICKS, RELOAD=TRUE
@@ -101,31 +98,31 @@ uint8_t EG_numberOfElements(void){
                         LOCAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-static void new_mov_event(void){
-/*	row_index++;
-	row_index &= 0b11;
-	colaPush(&event_queue, MOV_ARRIBA);
-*/
-
-
-}
-
-static void new_enter_event(void){
+static void readEncoder(void){
+	int64_t count = encoder.getCount();
+	if(count > 0){
+		eventBuffer.push(ENCODER_RIGHT);
+	}
+	else if(count < 0){
+		eventBuffer.push(ENCODER_LEFT);
+	}
+	encoder.setCount(0);
 	
 }
 
-static void IRAM_ATTR Timer0_ISR(){
-	for (uint8_t i = 0; i < 5; i++){
-		state_t estado = listButton[i]->getState();
-		if(estado == PRESS){
-			countButtonTicks[i]++;
-		}
-		else if(estado == PRESSED){
-			if(countButtonTicks[i] > LONG_PUSH_TICK){
-				eventBuffer.push(i+10);
-			}
-			eventBuffer.push(i);
-			countButtonTicks[i] = 0;
-		}
+static void readButtons(void){
+	if(encoderSwitch.getState() == PRESSED){
+		eventBuffer.push(ENCODER_SWITCH);
+	}
+	if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
+		eventBuffer.push(INIT_OF_LINE);
 	}	
+	if(finDeLinea.getState() == PRESS){	//Indica fin de linea apretado
+		eventBuffer.push(END_OF_LINE);
+	}
+}
+
+static void IRAM_ATTR Timer0_ISR(){
+	readEncoder();
+	readButtons();
 }
