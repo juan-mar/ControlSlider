@@ -49,8 +49,8 @@ Button::~Button(){
 
 }
 
-state_t Button::getState(){
-    state_t state = (digitalRead(this->pin) == activeLogic) ? PRESS : NOT_PRESSED;
+stateButtton_t Button::getState(){
+    stateButtton_t state = (digitalRead(this->pin) == activeLogic) ? PRESS : NOT_PRESSED;
     
     if(state == NOT_PRESSED && prevState == PRESS){
         this->prevState = NOT_PRESSED;

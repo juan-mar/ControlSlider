@@ -7,28 +7,13 @@ enum cursor_col{COL0 = 0, COL1, COL2, COL3, COL4, COL5, COL6, COL7, COL8, COL9, 
 enum cursor_fil{FILA0 = 0, FILA1};
 
 // Define positions for menu items
-#define RUN_COL         0
-#define RUN_FIL         0
-#define SETTING_COL     1
-#define SETTING_FIL     1
 #define PAUSE_COL       0
 #define PAUSE_FIL       0
 #define FINISH_COL      1
 #define FINISH_FIL      1
-#define MANUAL_COL      0
-#define MANUAL_FIL      0
-#define BLUETOOTH_COL   1
-#define BLUETOOTH_FIL   1
 #define BACK_COL        2
 #define BACK_FIL        2
-#define EDIT_PARTS_COL  0
-#define EDIT_PARTS_FIL  0
-#define SEL_PART_COL    1
-#define SEL_PART_FIL    0
-#define ADD_PART_COL    1
-#define ADD_PART_FIL    1
-#define DEL_COL         2
-#define DEL_FIL         2
+
 #define SEL_DIS_COL     0
 #define SEL_DIS_FIL     0
 #define SEL_DELTA_COL   1
@@ -57,20 +42,36 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define MENU_TITLE       "Camera Slider   "
 #define MENU_LINE1       " Run   Settings "           
 #define LINE2            " Continue    End"
+#define RUN_COL         0
+#define RUN_FIL         1
+#define SETTING_COL     6
+#define SETTING_FIL     1
 
-#define OFFSET_SETTINGS  7
-#define OFFSET_END       12 
-
+//PANTALLA DE CONFIGURACION
 #define BT_ON            " Bluetooth   ON "
 #define BT_OFF           " Bluetooth   OFF"
-#define SET_MAN          " Set Manually   "
-#define MOVE_MAN         " Move Manually  "
+#define SET_MAN          " Set Manually  B"
+#define MANUAL_COL      0
+#define MANUAL_FIL      0
+#define BLUETOOTH_COL   0
+#define BLUETOOTH_FIL   1
+#define BACK_COL        14
+#define BACK_FIL        0
+
 
 // PARTS
-#define PARTS            " Edit Part:     "
+#define PARTS            " Edit Part:    B"
 #define ADD_DEL          " Add         Del"
+#define EDIT_PARTS_COL  0
+#define EDIT_PARTS_FIL  0
+#define ADD_PART_COL    0
+#define ADD_PART_FIL    1
+#define DEL_COL         12
+#define DEL_FIL         1
+#define SEL_PART_COL    11
+#define SEL_PART_FIL    0
+#define NUN_PARTS_COL   12
 
-#define OFFSET_DEL       12
 
 // PART SETTINGS
 #define POSITIONS        " Xo:    Xf:    B"

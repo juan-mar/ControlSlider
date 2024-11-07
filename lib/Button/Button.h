@@ -23,7 +23,7 @@ typedef enum{
     PRESS,
     PRESSED,
     NOT_PRESSED
-}state_t;
+}stateButtton_t;
 
 /*******************************************************************************
  * CLASSES 
@@ -32,12 +32,12 @@ class Button{
 public:
     Button(int pin, activeLogic_t activeLogic = ACT_LOW);
     ~Button();
-    state_t getState();
+    stateButtton_t getState();
     
 private:
     int pin;
     activeLogic_t activeLogic;
-    state_t prevState;
+    stateButtton_t prevState;
 
 };
 

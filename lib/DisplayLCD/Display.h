@@ -33,6 +33,7 @@ void show_screen(const char * fila1, const char * fila2);
 //Funcion que posiciona el cursor en determinada ubicacion. Primero lo borra de la ubicacion anterior
 void show_curs(int col, int fil);
 
+void disp_write(char word, int pos_x, int pos_y);
 
 
 #endif /* DISPLAY_H_ */

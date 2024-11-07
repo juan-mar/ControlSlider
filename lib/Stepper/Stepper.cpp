@@ -55,7 +55,6 @@ void InitMotor()
     pinMode(DIR, OUTPUT);
     pinMode(STEP, OUTPUT);
     digitalWrite(EN, ON);
-    return;
 }
 
 int calcSpeed(int x_o, int x_f, float time)
@@ -83,23 +82,22 @@ void enableMotor(bool en)
     {
         digitalWrite(EN, ON);
     }
-    return;
 }
 
 int setDir(bool dir)
 {
     digitalWrite(DIR, dir);
-    return;
+    return 0;
 }
 
 int getEstado()
 {
-    return;
+    return 0;
 }
 
 void moveMotor()
 {
-    return;
+
 }
 
 /*******************************************************************************

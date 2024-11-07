@@ -3,7 +3,12 @@
 #include "Stepper.h"
 
 Slider::Slider(){
-
+    numTramos = 1;
+    esLoop = false;
+    std::array<double, 2> tramo = {0, 1};
+    distanciasTramos.push_back(tramo);
+    tiemposTramos.push_back(10);
+        
 }
 
 Slider::~Slider(){

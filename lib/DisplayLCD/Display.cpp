@@ -87,6 +87,11 @@ void show_screen(const char * fila1, const char * fila2)
     return;
 }
 
+void disp_write(char word, int pos_x, int pos_y)
+{
+    display.setCursor(pos_x, pos_y);
+    display.print(word);
+}
 /*******************************************************************************
  *******************************************************************************
  LOCAL FUNCTION DEFINITIONS

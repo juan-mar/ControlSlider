@@ -86,7 +86,7 @@ static void show_run(void);
 static void show_settings(void);
 static void show_bluetooth(void);
 static void show_set_manually(void);
-static void show_part_n(void);
+static void show_part_to_edit(void);
 static void show_edit_part(void);
 static void show_select_dis(void);
 static void show_select_delta_t(void);
@@ -115,14 +115,14 @@ static void run_slider(void);
  ******************************************************************************/
 
 state_edge_t estado_init[] = {
-	{ENCODER_RIGHT, menu, show_menu, do_nothing},
-    {ENCODER_LEFT, menu, show_menu, do_nothing},
-	{ENCODER_SWITCH, menu, show_menu, do_nothing},
+	{ENCODER_RIGHT, menu, show_menu, show_menu},
+    {ENCODER_LEFT, menu, show_menu, show_menu},
+	{ENCODER_SWITCH, menu, show_menu, show_menu},
     
-	{INIT_OF_LINE, menu, show_menu, do_nothing},
-    {END_OF_LINE, menu, show_menu, do_nothing},
+	{INIT_OF_LINE, menu, show_menu, show_menu},
+    {END_OF_LINE, menu, show_menu, show_menu},
 
-    {NONE, menu, show_menu, do_nothing}
+    {NONE, menu, show_menu, show_menu}
 };
 
 state_edge_t menu[] = {
@@ -136,31 +136,31 @@ state_edge_t menu[] = {
 
 	//Eventos de transiscion 
 	{RUN_, run, show_run, show_run},
-	{SETTING, settings, do_nothing, show_settings},
+	{SETTING, settings, show_settings, show_settings},
 
-    {NONE, menu, do_nothing, do_nothing}
+    {NONE, menu, do_nothing, show_menu}
 };
 
 
 state_edge_t settings[] = {
 	//eventos de EventGenerator
-    {ENCODER_RIGHT, settings, nextItem, show_menu},
-    {ENCODER_LEFT, settings, prevItem, show_menu},
-	{ENCODER_SWITCH, settings, selectItem, show_run},
+    {ENCODER_RIGHT, settings, nextItem, show_settings},
+    {ENCODER_LEFT, settings, prevItem, show_settings},
+	{ENCODER_SWITCH, settings, selectItem, show_settings},
 
 	{INIT_OF_LINE, settings, do_nothing, show_settings},
     {END_OF_LINE, settings, do_nothing, show_settings},
 
 	//Eventos de transiscion
-	{MANUAL, set_manually, do_nothing, show_set_manually},
+	{MANUAL, set_manually, show_set_manually, show_set_manually},
 	{BLUETOOTH, bluetooth, activeBluetooth, show_bluetooth},
-	
-    {NONE, estado_init, do_nothing, do_nothing}
+	{BACK, menu, show_menu, show_menu},
+    {NONE, settings, do_nothing, show_settings}
 };
 
 state_edge_t bluetooth[] = {
     {ENCODER_SWITCH, settings, do_nothing, show_settings},
-    {NONE, estado_init, do_nothing, do_nothing}
+    {NONE, bluetooth, do_nothing, do_nothing}
 };
 
 state_edge_t set_manually[] = {
@@ -173,23 +173,23 @@ state_edge_t set_manually[] = {
 	{END_OF_LINE, set_manually, do_nothing, show_set_manually},
 
 	//Eventos de transiscion
-	{EDIT_PARTS, set_part_to_edit, do_nothing, show_part_n},
+	{EDIT_PARTS, set_part_to_edit, do_nothing, show_part_to_edit},
 	{ADD_PART, set_manually, do_nothing, show_set_manually},
 	{DELETE_PART, set_manually, do_nothing, show_set_manually},
-
-	{NONE, estado_init, do_nothing, do_nothing}
+	{BACK, settings, show_settings, show_settings},
+	{NONE, set_manually, do_nothing, show_set_manually}
 };
 
 state_edge_t set_part_to_edit[] = {
 	//Eventos de EventGenerator
-	{ENCODER_RIGHT, set_part_to_edit, nextPart, show_part_n},
-	{ENCODER_LEFT, set_part_to_edit, prevPart, show_part_n},	
-	{ENCODER_SWITCH, edit_parts, do_nothing, do_nothing},
+	{ENCODER_RIGHT, set_part_to_edit, nextPart, show_part_to_edit},
+	{ENCODER_LEFT, set_part_to_edit, prevPart, show_part_to_edit},	
+	{ENCODER_SWITCH, edit_parts, show_edit_part, show_edit_part},
 
 	{INIT_OF_LINE, set_part_to_edit, do_nothing, do_nothing},
 	{END_OF_LINE, set_part_to_edit, do_nothing, do_nothing},
 
-	{NONE, estado_init, do_nothing, do_nothing}
+	{NONE, set_part_to_edit, do_nothing, show_part_to_edit}
 };
 
 state_edge_t edit_parts[] = {
@@ -214,12 +214,12 @@ state_edge_t edit_parts[] = {
 
 state_edge_t selec_distances[] = {
 	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_distances, nextItem, show_part_n},
-	{ENCODER_LEFT, selec_distances, prevItem, show_part_n},
-	{ENCODER_SWITCH, selec_distances, selectItem, show_part_n},
+	{ENCODER_RIGHT, selec_distances, nextItem, show_part_to_edit},
+	{ENCODER_LEFT, selec_distances, prevItem, show_part_to_edit},
+	{ENCODER_SWITCH, selec_distances, selectItem, show_part_to_edit},
 
-	{INIT_OF_LINE, selec_distances, do_nothing, show_part_n},
-	{END_OF_LINE, selec_distances, do_nothing, show_part_n},
+	{INIT_OF_LINE, selec_distances, do_nothing, show_part_to_edit},
+	{END_OF_LINE, selec_distances, do_nothing, show_part_to_edit},
 
 	//Eventos de transiscion
 	{X0, selec_distances, do_nothing, do_nothing},
@@ -233,12 +233,12 @@ state_edge_t selec_distances[] = {
 
 state_edge_t selec_delta_t[] = {
 	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_delta_t, nextItem, show_part_n},
-	{ENCODER_LEFT, selec_delta_t, prevItem, show_part_n},
-	{ENCODER_SWITCH, selec_delta_t, selectItem, show_part_n},
+	{ENCODER_RIGHT, selec_delta_t, nextItem, show_part_to_edit},
+	{ENCODER_LEFT, selec_delta_t, prevItem, show_part_to_edit},
+	{ENCODER_SWITCH, selec_delta_t, selectItem, show_part_to_edit},
 
-	{INIT_OF_LINE, selec_delta_t, do_nothing, show_part_n},
-	{END_OF_LINE, selec_delta_t, do_nothing, show_part_n},
+	{INIT_OF_LINE, selec_delta_t, do_nothing, show_part_to_edit},
+	{END_OF_LINE, selec_delta_t, do_nothing, show_part_to_edit},
 
 	//Eventos de transiscion
 	{DIGIT_0, selec_delta_t, do_nothing, do_nothing},
@@ -253,12 +253,12 @@ state_edge_t selec_delta_t[] = {
 state_edge_t selec_vel[] = {
 
 	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_vel, nextItem, show_part_n},
-	{ENCODER_LEFT, selec_vel, prevItem, show_part_n},
-	{ENCODER_SWITCH, selec_vel, selectItem, show_part_n},
+	{ENCODER_RIGHT, selec_vel, nextItem, show_part_to_edit},
+	{ENCODER_LEFT, selec_vel, prevItem, show_part_to_edit},
+	{ENCODER_SWITCH, selec_vel, selectItem, show_part_to_edit},
 
-	{INIT_OF_LINE, selec_vel, do_nothing, show_part_n},
-	{END_OF_LINE, selec_vel, do_nothing, show_part_n},
+	{INIT_OF_LINE, selec_vel, do_nothing, show_part_to_edit},
+	{END_OF_LINE, selec_vel, do_nothing, show_part_to_edit},
 
 	//Eventos de transiscion
 	{DIGIT_0, selec_vel, do_nothing, do_nothing},
@@ -304,7 +304,7 @@ static menu_items_t main_menu_items = {{{0, RUN_, RUN_COL, RUN_FIL},
 static menu_items_t run_items = {{{0, PAUSE_, PAUSE_COL, PAUSE_FIL},
 									{1, FINISH, FINISH_COL, FINISH_FIL},
 								  {2, BACK, BACK_COL, BACK_FIL}},
-								  0, 2};
+								  0, 3};
 
 static menu_items_t setting_items = {{{0, MANUAL, MANUAL_COL, MANUAL_FIL},
 										  {1, BLUETOOTH, BLUETOOTH_COL, BLUETOOTH_FIL},
@@ -365,7 +365,8 @@ static void nextItem(void){
 	if(currentStateItem->item_selec >= currentStateItem->item_cant){
 		currentStateItem->item_selec = 0;
 	}
-	show_curs(currentStateItem->item->cursor_pos_col, currentStateItem->item->cursor_pos_fil);
+	Serial.println(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col);
+	
 }
 
 static void prevItem(void){
@@ -375,7 +376,8 @@ static void prevItem(void){
 	else{
 		currentStateItem->item_selec--;
 	}
-	show_curs(currentStateItem->item->cursor_pos_col, currentStateItem->item->cursor_pos_fil);
+	Serial.println(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col);
+
 }
 
 static void selectItem(void){
@@ -388,32 +390,8 @@ static void selectItem(void){
 static void show_menu(void){
 	currentStateItem = &main_menu_items;
 	show_screen(MENU_TITLE, MENU_LINE1);
-	
-}
-
-
-/*******************************************************************************
- * 						Setting FUNCTIONS
- ******************************************************************************/
-static void show_settings(void) {
-	currentStateItem = &setting_items;
-	show_screen(BT_OFF, SET_MAN);
-}
-
-static void show_bluetooth(void) {
-	static bool bt = false;
-	bt = !bt;
-	if(bt){
-		show_screen(BT_ON,BLANK);
-		//TODO: Implementar la activacion del bluetooth
-	}
-	else{
-		show_screen(BT_OFF,SET_MAN);
-	}
-}
-
-static void activeBluetooth(void){
-
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 }
 
 /*******************************************************************************
@@ -422,7 +400,46 @@ static void activeBluetooth(void){
 static void show_run(void) {
 	currentStateItem = &run_items;
 	show_screen(RUN, PAUSE_FINISH);	
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 }
+
+/*******************************************************************************
+ * 						Setting FUNCTIONS
+ ******************************************************************************/
+static void show_settings(void) {
+	currentStateItem = &setting_items;
+	show_screen(SET_MAN, BT_OFF);
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+}
+
+
+/*******************************************************************************
+ * 						bluetooth FUNCTIONS
+ ******************************************************************************/
+static void show_bluetooth(void) {
+	static bool bt = false;
+	bt = !bt;
+	if(bt){
+		show_screen(BT_ON,BLANK);
+		show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+
+		//TODO: Implementar la activacion del bluetooth
+	}
+	else{
+		show_screen(BT_OFF,SET_MAN);
+		show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+
+	}
+}
+
+static void activeBluetooth(void){
+
+}
+
 
 /*******************************************************************************
  * 						Set Manually FUNCTIONS
@@ -430,30 +447,8 @@ static void show_run(void) {
 static void show_set_manually(void) {
 	currentStateItem = &set_manually_items;
 	show_screen(PARTS, ADD_DEL);
-}
-
-//TODO: Implementar las funciones de de partes
-static void show_part_n(void) {
-	show_screen(BLANK, ADD_DEL);
-	show_curs(SEL_PART_COL, SEL_PART_FIL);
-}
-
-static void nextPart(void) {
-	part_to_edit++;
-	if(part_to_edit >= slider.numTramos){
-		part_to_edit = 0;
-	}
-	show_part_n();
-}
-
-static void prevPart(void) {
-	if(part_to_edit == 0){
-		part_to_edit = slider.numTramos - 1;
-	}
-	else{
-		part_to_edit--;
-	}
-	show_part_n();
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 }
 
 static void add_part(void) {
@@ -465,11 +460,43 @@ static void delete_part(void) {
 }
 
 /*******************************************************************************
+ * 						select part to edit FUNCTIONS
+ ******************************************************************************/
+static void show_part_to_edit(void) {
+	show_screen(PARTS, ADD_DEL);
+	show_curs(SEL_PART_COL, SEL_PART_FIL);
+	disp_write('0'+part_to_edit, NUN_PARTS_COL, SEL_PART_FIL);
+
+}
+
+static void nextPart(void) {
+	part_to_edit++;
+	if(part_to_edit >= slider.numTramos){
+		part_to_edit = 0;
+	}
+}
+
+static void prevPart(void) {
+	if(part_to_edit == 0){
+		part_to_edit = slider.numTramos - 1;
+	}
+	else{
+		part_to_edit--;
+	}
+}
+
+
+
+
+/*******************************************************************************
  * 						edit part n FUNCTIONS
  ******************************************************************************/
 static void show_edit_part(void) {
 	currentStateItem = &edit_parts_items;
 	show_screen(POSITIONS, TIME_VEL);
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+
 }
 
 /*******************************************************************************
@@ -479,6 +506,8 @@ static void show_edit_part(void) {
 static void show_select_dis(void) {
 	currentStateItem = &selec_dis_items;
 	show_screen(BLANK, BLANK);
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 }	
 
 
@@ -489,6 +518,9 @@ static void show_select_dis(void) {
 static void show_select_delta_t(void) {
 	currentStateItem = &selec_numbers;
 	show_screen(BLANK, BLANK);
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+
 }	
 
 /*******************************************************************************
