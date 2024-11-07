@@ -2,6 +2,7 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 #include "Stepper.h"
+#include "slider.h"
 
 
 /*******************************************************************************
@@ -16,16 +17,16 @@
  //static DRV8825 stepper(MOTOR_STEPS, DIR, STEP, SLEEP, MODE0, MODE1, MODE2);
 
 typedef struct{
-    int microsteps;
-    int vel;
     bool dir;
+    float vel;
+    float time;
 }motor_t;
 
 
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
  ******************************************************************************/
-motor_t stepper;
+// motor_t stepper;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
@@ -50,9 +51,10 @@ motor_t stepper;
  ******************************************************************************/
 void InitMotor()
 {
-    stepper.microsteps = MICROSTEPS;
-    stepper.dir = HORARIO;
-    stepper.vel = 0;
+    pinMode(EN, OUTPUT);
+    pinMode(DIR, OUTPUT);
+    pinMode(STEP, OUTPUT);
+    digitalWrite(EN, ON);
     return;
 }
 
@@ -70,16 +72,35 @@ int calcSpeed(int x_o, int x_f, float time)
     return speed;
 }
 
-void setMove(float time, bool dir, int dist)
+
+void enableMotor(bool en)
 {
-    digitalWrite(DIR, dir);
-    digitalWrite(STEP, HIGH);
-    stepper.dir = dir;
+    if(digitalRead(EN) == ON)
+    {
+        digitalWrite(EN, OFF);
+    }
+    else
+    {
+        digitalWrite(EN, ON);
+    }
     return;
 }
 
+int setDir(bool dir)
+{
+    digitalWrite(DIR, dir);
+    return;
+}
 
+int getEstado()
+{
+    return;
+}
 
+void moveMotor()
+{
+    return;
+}
 
 /*******************************************************************************
  *******************************************************************************

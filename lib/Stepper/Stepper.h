@@ -8,22 +8,21 @@
 /*******************************************************************************
  * CONEXION DE PINES
  ******************************************************************************/
-#define DIR 26
-#define STEP 27
+#define DIR     26
+#define STEP    27
+#define EN      25
 //#define SLEEP 35
 
 #define HIGH    1
 #define LOW     0
+#define ON      0
+#define OFF     1
+
+#define MAX_PARTS   5
 
  /*******************************************************************************
  * DEFINICION DE CONSTANTES
  ******************************************************************************/
-#define MOTOR_STEPS 200
-
-//#define RPM 120
-
-#define MOTOR_ACCEL 2000
-#define MOTOR_DECEL 1000
 
 #define MICROSTEPS  32
 
@@ -37,6 +36,8 @@ void InitMotor();
 
 int calcSpeed(int x_o, int x_f, float time);
 
-void setMove(float vel, bool dir);
+int setDir(bool dir);
+
+int getEstado();
 
 #endif /* STEPPER_H_ */
