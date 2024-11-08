@@ -43,11 +43,12 @@ public:
     ~Motor();
 
 
-    void calcTraj(int x_o, int x_f, float time);   //Funcion para calcular la velocidad
+    void calcTraj(int x_o, int x_f, float time);      //Funcion para calcular la velocidad
     void enableMotor(bool en);                      //Funcion para habilitar el motor
     void setDir(bool dir);                          //Funcion para cambiar la direccion
     bool isMoving();                                //Funcion para obtener el estado del motor
     void toggleMove();                              //Funcion para mover el motor
+    int getTimeConst();                             //Funcion para obtener la constante de tiempo
 
 
 private:
@@ -56,6 +57,7 @@ private:
     int speed;
     int stepsRemainig;
     int enPin;
+    int timeConst;
 
 
 };

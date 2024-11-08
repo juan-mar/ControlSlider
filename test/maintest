@@ -8,6 +8,11 @@
 
 #include "ESP32Encoder.h"
 
+uint64_t timer_1 = 0;
+
+void moveStepper(void);
+
+Motor stepper(STEP, DIR, EN);
  
 void setup() {
     Serial.begin(115200);
@@ -17,7 +22,6 @@ void setup() {
     //EG_addExternEvent(NONE);
     InitDisp();
     show_screen("Hello World.....", BLANK);
-
     //show_curs(0, 1);
 
     //DRV_Enc_Init();
@@ -25,21 +29,17 @@ void setup() {
 }
 
 void loop() {
-    int vel = 1;
-    bool dir = 0;
-    if(dir){
-        digitalWrite(DIR, HIGH); //Spinning Clockwise
-    }
-    else{
-        digitalWrite(DIR, LOW); // Spinning Anti-Clockwise
+    stepper.calcTraj(0, 100, 10);
+    if(millis() - timer_1 > (stepper.getTimeConst()/2)){
+        moveStepper();
+        timer_1 = millis();
     }
 
 
-    for (int i = 0; i < MICROSTEPS; i++) {
-        digitalWrite(STEP, HIGH);
-        delayMicroseconds(vel);
-        digitalWrite(STEP, LOW);
-        delayMicroseconds(vel);
-   
+}
 
+
+void moveStepper()
+{
+    stepper.toggleMove();
 }

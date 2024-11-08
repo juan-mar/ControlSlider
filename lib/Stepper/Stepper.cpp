@@ -58,6 +58,7 @@ Motor::Motor(int step, int dir, int en)
     pinMode(stepPin, OUTPUT);
     dirPin = dir;
     digitalWrite(enPin, ON);
+    setDir(HORARIO);
 }
 
 
@@ -68,19 +69,10 @@ Motor::~Motor()
 
 void Motor::calcTraj(int x_o, int x_f, float time)
 {
-    int vel;
-    int steps = abs(x_f - x_o);
-    stepsRemainig = steps;
-    if(time)
-    {
-        vel = (x_f - x_o)/time;             //me da en pasos por segundo
-    }
-    else
-    {
-        vel = 0;
-    }
-    speed = vel;
-    vel < 0 ? setDir(ANTIHORARIO) : setDir(HORARIO);
+    stepsRemainig = abs(x_f - x_o);
+    speed = stepsRemainig/(time*1000);                     //me da en pasos por ms
+    x_f < x_o ? setDir(ANTIHORARIO) : setDir(HORARIO);
+    timeConst = 1000 * time/stepsRemainig;                 //tiempo entre pasos en ms
 }
 
 
@@ -123,6 +115,11 @@ void Motor::toggleMove() //cuidado a la mitad de los tiempos tiene que llamarse 
     {
         digitalWrite(stepPin, LOW);
     }
+}
+
+int Motor::getTimeConst()
+{
+    return timeConst;
 }
 
 /*******************************************************************************
