@@ -2,7 +2,7 @@
 #define STEPPER_H_
 
 #include<Arduino.h>
-#include "DRV8825.h"
+//#include "DRV8825.h"
 
 
 /*******************************************************************************
@@ -32,12 +32,39 @@
 /*******************************************************************************
  * DEFINICION DE FUNCIONES
  ******************************************************************************/
-void InitMotor();
+class Motor{
+public:
+    //Constructor
+    Motor(int stepPin, int dirPin);
 
-int calcSpeed(int x_o, int x_f, float time);
+    //Destructor
+    ~Motor();
 
-int setDir(bool dir);
 
-int getEstado();
+    void calcTraj(int x_o, int x_f, float time);   //Funcion para calcular la velocidad
+    void enableMotor(bool en);                      //Funcion para habilitar el motor
+    void setDir(bool dir);                          //Funcion para cambiar la direccion
+    bool isMoving();                                //Funcion para obtener el estado del motor
+    void toggleMove();                              //Funcion para mover el motor
+
+
+private:
+    int stepPin;
+    int dirPin;
+    int speed;
+    int stepsRemainig;
+
+
+};
+
+
+
+//void InitMotor();
+
+//int calcSpeed(int x_o, int x_f, float time);
+
+//int setDir(bool dir);
+
+//int getEstado();
 
 #endif /* STEPPER_H_ */

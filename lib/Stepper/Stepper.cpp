@@ -49,32 +49,43 @@ typedef struct{
     GLOBAL METHODS DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-void InitMotor()
+Motor::Motor(int step, int dir)
 {
     pinMode(EN, OUTPUT);
-    pinMode(DIR, OUTPUT);
-    pinMode(STEP, OUTPUT);
+    pinMode(dirPin, OUTPUT);
+    stepPin = step;
+    pinMode(stepPin, OUTPUT);
+    dirPin = dir;
     digitalWrite(EN, ON);
 }
 
-int calcSpeed(int x_o, int x_f, float time)
+
+Motor::~Motor()
 {
-    int speed;
+
+}
+
+void Motor::calcTraj(int x_o, int x_f, float time)
+{
+    int vel;
+    int steps = abs(x_f - x_o);
+    stepsRemainig = steps;
     if(time)
     {
-    speed = (x_f - x_o)/time;
+        vel = (x_f - x_o)/time;             //me da en pasos por segundo
     }
     else
     {
-    speed = 0;
+        vel = 0;
     }
-    return speed;
+    speed = vel;
+    vel < 0 ? setDir(ANTIHORARIO) : setDir(HORARIO);
 }
 
 
-void enableMotor(bool en)
+void Motor::enableMotor(bool en)
 {
-    if(digitalRead(EN) == ON)
+    if(en == ON)
     {
         digitalWrite(EN, OFF);
     }
@@ -84,20 +95,33 @@ void enableMotor(bool en)
     }
 }
 
-int setDir(bool dir)
+void Motor::setDir(bool dir)
 {
     digitalWrite(DIR, dir);
-    return 0;
 }
 
-int getEstado()
+bool Motor::isMoving()
 {
-    return 0;
+    if(stepsRemainig)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
-void moveMotor()
+void Motor::toggleMove() //cuidado a la mitad de los tiempos tiene que llamarse esta funcion
 {
-
+    if(stepPin == LOW)
+    {
+        digitalWrite(stepPin, HIGH);
+    }
+    else
+    {
+        digitalWrite(stepPin, LOW);
+    }
 }
 
 /*******************************************************************************

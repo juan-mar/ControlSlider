@@ -1,0 +1,45 @@
+#include <Arduino.h>
+#include "EventGenerator.h"
+#include "fsm.h"
+#include "fsmTable.h"
+#include "screen.h"
+#include "Display.h"
+#include "Stepper.h"
+
+#include "ESP32Encoder.h"
+
+ 
+void setup() {
+    Serial.begin(115200);
+
+    //EG_init();
+    //state = FSM_GetInitState();
+    //EG_addExternEvent(NONE);
+    InitDisp();
+    show_screen("Hello World.....", BLANK);
+
+    //show_curs(0, 1);
+
+    //DRV_Enc_Init();
+ 
+}
+
+void loop() {
+    int vel = 1;
+    bool dir = 0;
+    if(dir){
+        digitalWrite(DIR, HIGH); //Spinning Clockwise
+    }
+    else{
+        digitalWrite(DIR, LOW); // Spinning Anti-Clockwise
+    }
+
+
+    for (int i = 0; i < MICROSTEPS; i++) {
+        digitalWrite(STEP, HIGH);
+        delayMicroseconds(vel);
+        digitalWrite(STEP, LOW);
+        delayMicroseconds(vel);
+   
+
+}
