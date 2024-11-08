@@ -49,14 +49,15 @@ typedef struct{
     GLOBAL METHODS DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-Motor::Motor(int step, int dir)
+Motor::Motor(int step, int dir, int en)
 {
-    pinMode(EN, OUTPUT);
+    pinMode(en, OUTPUT);
+    enPin = en;
     pinMode(dirPin, OUTPUT);
     stepPin = step;
     pinMode(stepPin, OUTPUT);
     dirPin = dir;
-    digitalWrite(EN, ON);
+    digitalWrite(enPin, ON);
 }
 
 
@@ -87,17 +88,17 @@ void Motor::enableMotor(bool en)
 {
     if(en == ON)
     {
-        digitalWrite(EN, OFF);
+        digitalWrite(enPin, OFF);
     }
     else
     {
-        digitalWrite(EN, ON);
+        digitalWrite(enPin, ON);
     }
 }
 
 void Motor::setDir(bool dir)
 {
-    digitalWrite(DIR, dir);
+    digitalWrite(dirPin, dir);
 }
 
 bool Motor::isMoving()

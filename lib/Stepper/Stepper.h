@@ -15,6 +15,8 @@
 
 #define HIGH    1
 #define LOW     0
+
+//Para el enable, es activo bajo
 #define ON      0
 #define OFF     1
 
@@ -35,7 +37,7 @@
 class Motor{
 public:
     //Constructor
-    Motor(int stepPin, int dirPin);
+    Motor(int stepPin, int dirPin, int enPin);
 
     //Destructor
     ~Motor();
@@ -53,6 +55,7 @@ private:
     int dirPin;
     int speed;
     int stepsRemainig;
+    int enPin;
 
 
 };
