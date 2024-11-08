@@ -1,45 +1,62 @@
 #include <Arduino.h>
-#include "EventGenerator.h"
-#include "fsm.h"
-#include "fsmTable.h"
-#include "screen.h"
-#include "Display.h"
 #include "Stepper.h"
-
-#include "ESP32Encoder.h"
+#include "board.h"
+#define CLK   APB_CLK_FREQ 	// Hz
+#define FREQ  (10000000)  		// Hz  
+#define TIME_EVENT_INTERRUPT  (0.000002f) //s
+#define TICK_S (1.0f/(float)FREQ)
+#define TIME_2_TICKS(x) ((uint64_t)((x)/TICK_S))
 
 uint64_t timer_1 = 0;
+hw_timer_t *Timer0_Cfg = NULL;
 
 void moveStepper(void);
 
-Motor stepper(STEP, DIR, EN);
+Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
  
 void setup() {
     Serial.begin(115200);
+    Serial.println("Hello Wordl");    
 
-    //EG_init();
-    //state = FSM_GetInitState();
-    //EG_addExternEvent(NONE);
-    InitDisp();
-    show_screen("Hello World.....", BLANK);
-    //show_curs(0, 1);
+    Timer0_Cfg = timerBegin(0, CLK/FREQ, true); //TIMER_0, PRESCALES=80, COUNT_UP=TRUE
+  	timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true); //TIMER_0, CALL_BACK, MODE_EDGE=TRUE
+  	
+    timerAlarmWrite(Timer0_Cfg, TIME_2_TICKS(TIME_EVENT_INTERRUPT), true); //TIMER_0, N_TICKS, RELOAD=TRUE
+	timerAlarmEnable(Timer0_Cfg); //ENABLE
 
-    //DRV_Enc_Init();
- 
+
+    stepper.calcTraj(0, 1000, 5);
+    Serial.println("Hello Wordl");
+    Serial.println(stepper.getTimeConst());
+    
 }
 
 void loop() {
-    stepper.calcTraj(0, 100, 10);
-    if(millis() - timer_1 > (stepper.getTimeConst()/2)){
-        moveStepper();
-        timer_1 = millis();
-    }
 
+    while(stepper.getStepsRemainig()){
+        if(millis() - timer_1 > (stepper.getTimeConst()/2)){
+            moveStepper();
+            timer_1 = millis();
+        }
+    }
+    delay(2000);
+    
+    stepper.calcTraj(0, 1000, 5);
+    stepper.setDir(!stepper.getDir());
+    Serial.println("Direccion");
+    Serial.println(stepper.getDir());
+
+    delay(3000);
+   // stepper.setDir(!stepper.getDir());
 
 }
 
+void Timer0_ISR(void){
+    stepper.sendStep();
+}   
 
 void moveStepper()
 {
-    stepper.toggleMove();
+    stepper.sendStep();
+//    Serial.println(stepper.getStepsRemainig());
 }

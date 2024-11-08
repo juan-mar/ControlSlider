@@ -19,7 +19,7 @@ void moveStepper(void);
 
 Motor stepper(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_HIGH);
-Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
+Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
 Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
 
  
@@ -30,15 +30,12 @@ void setup() {
     Serial.println("Hello Wordl");
 //    Serial.println(stepper.getTimeConst());
     stepper.setDir(HORARIO);
-    detecto = 0;
+    
 }
 
 void loop() {
-
-    Serial.println(digitalRead(PIN_START_LINE));
     if(detecto){	//Indica inicio de linea apretado
-     //   Serial.println("Inicio de linea - 2");
-       //     Serial.println(detecto);
+        Serial.println("Inicio de linea - 2");
 
 	}
     else{
@@ -46,7 +43,6 @@ void loop() {
             moveStepper();
             timer_2 = millis();
         }
-
     }
 	
     //stepper.setDir();
@@ -54,12 +50,9 @@ void loop() {
     if(millis() - timer_1 > 100){
         if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
             detecto = 1;
-        //    Serial.println("Inicio de linea");
-        //    Serial.println(pasos/2);
+            Serial.println("Inicio de linea");
+            Serial.println(pasos/2);
 	    }
-        else{
-            detecto = 0;
-        }
         
     }
 

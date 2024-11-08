@@ -16,12 +16,6 @@
  ******************************************************************************/
  //static DRV8825 stepper(MOTOR_STEPS, DIR, STEP, SLEEP, MODE0, MODE1, MODE2);
 
-typedef struct{
-    bool dir;
-    float vel;
-    float time;
-}motor_t;
-
 
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
@@ -53,12 +47,16 @@ Motor::Motor(int step, int dir, int en)
 {
     pinMode(en, OUTPUT);
     enPin = en;
-    pinMode(dirPin, OUTPUT);
+
+    pinMode(step, OUTPUT);
     stepPin = step;
-    pinMode(stepPin, OUTPUT);
+    
+    pinMode(dir, OUTPUT);
     dirPin = dir;
+    
     digitalWrite(enPin, ON);
-    setDir(HORARIO);
+    digitalWrite(dirPin, HIGH);
+   
 }
 
 
@@ -71,7 +69,6 @@ void Motor::calcTraj(int x_o, int x_f, float time)
 {
     stepsRemainig = abs(x_f - x_o);
     speed = stepsRemainig/(time*1000);                     //me da en pasos por ms
-    x_f < x_o ? setDir(ANTIHORARIO) : setDir(HORARIO);
     timeConst = 1000 * time/stepsRemainig;                 //tiempo entre pasos en ms
 }
 
@@ -88,10 +85,15 @@ void Motor::enableMotor(bool en)
     }
 }
 
-void Motor::setDir(bool dir)
+void Motor::setDir(int dir_)
 {
-    digitalWrite(dirPin, dir);
+    digitalWrite(dirPin, dir_);
 }
+
+int Motor::getDir()
+{
+    return digitalRead(dirPin);
+}   
 
 bool Motor::isMoving()
 {
@@ -105,11 +107,14 @@ bool Motor::isMoving()
     }
 }
 
-void Motor::toggleMove() //cuidado a la mitad de los tiempos tiene que llamarse esta funcion
+void Motor::sendStep() //cuidado a la mitad de los tiempos tiene que llamarse esta funcion
 {
-    if(stepPin == LOW)
+    //digitalWrite(stepPin, !digitalRead(stepPin));
+    
+    if( digitalRead(stepPin) == LOW)
     {
         digitalWrite(stepPin, HIGH);
+        stepsRemainig--;
     }
     else
     {
@@ -122,6 +127,9 @@ int Motor::getTimeConst()
     return timeConst;
 }
 
+uint64_t Motor::getStepsRemainig(){
+    return stepsRemainig;
+}
 /*******************************************************************************
  *******************************************************************************
  LOCAL FUNCTION DEFINITIONS

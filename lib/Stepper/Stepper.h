@@ -2,16 +2,11 @@
 #define STEPPER_H_
 
 #include<Arduino.h>
-//#include "DRV8825.h"
 
 
 /*******************************************************************************
  * CONEXION DE PINES
  ******************************************************************************/
-#define DIR     26
-#define STEP    27
-#define EN      25
-//#define SLEEP 35
 
 #define HIGH    1
 #define LOW     0
@@ -45,10 +40,12 @@ public:
 
     void calcTraj(int x_o, int x_f, float time);      //Funcion para calcular la velocidad
     void enableMotor(bool en);                      //Funcion para habilitar el motor
-    void setDir(bool dir);                          //Funcion para cambiar la direccion
+    void setDir(int dir);                          //Funcion para cambiar la direccion
+    int getDir();                                  //Funcion para obtener la direccion
     bool isMoving();                                //Funcion para obtener el estado del motor
-    void toggleMove();                              //Funcion para mover el motor
-    int getTimeConst();                             //Funcion para obtener la constante de tiempo
+    void sendStep();                              //Funcion para mover el motor
+    int getTimeConst();  
+    uint64_t getStepsRemainig();                           //Funcion para obtener la constante de tiempo
 
 
 private:

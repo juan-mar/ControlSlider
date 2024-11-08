@@ -2,18 +2,24 @@
 #define BOARD_BOARD_H_
 
 /*******************************************************************************
- * CONEXION DE BOTONES
+ * CONEXION DE FINALES DE CARRERA
  ******************************************************************************/
 #define PIN_START_LINE      5
 #define PIN_END_LINE        18
 
+/*******************************************************************************
+ * CONEXION DE MOTORES
+ ******************************************************************************/
+#define PIN_MOTOR_DIR       19
+#define PIN_MOTOR_STEP      23
+#define PIN_MOTOR_EN        21
 
 /*******************************************************************************
  * CONEXION DE SENSORES
  ******************************************************************************/
-#define PIN_ENCODER_A         22
-#define PIN_ENCODER_B         23
-#define PIN_ENCODER_SW        19
+#define PIN_ENCODER_A         34
+#define PIN_ENCODER_B         35
+#define PIN_ENCODER_SW        22
 
 /*******************************************************************************
  * CONEXION DE DISPLAY
