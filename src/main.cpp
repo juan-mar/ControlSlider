@@ -1,82 +1,79 @@
 #include <Arduino.h>
-#include "EventGenerator.h"
+#include "CircularBuffer.h"
 #include "fsm.h"
 #include "fsmTable.h"
 #include "screen.h"
 #include "Display.h"
-#include "Stepper.h"
 #include "board.h"
-#include "Button.h" 
+#include "Button.h"
+#include "EventGenerator.h"
 #include "ESP32Encoder.h"
 
-int detecto = 0;
-uint64_t pasos = 0;
-uint64_t timer_1 = 0;
-uint64_t timer_2 = 0;
-void readButtons(void);
-
-void moveStepper(void);
-
-Motor stepper(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
+//sensores 
+ESP32Encoder encoder;
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_HIGH);
-Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
+Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
 Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
 
- 
+void readEncoder();
+void readButtons(void);
+
+//timers
+uint64_t timer_1 = 0;
+
+//Cola de enventos
+#define MAX_EVENT   100
+
+//State machine
+state_t state;
+
 void setup() {
     Serial.begin(115200);
+    
+    EG_init();
+    state = FSM_GetInitState();
+    EG_addExternEvent(NONE);
+    InitDisp();
+    show_screen("Hello World.....", BLANK);
+    //show_curs(0, 1);
+    
+    //Set up encoder
+    encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
+	encoder.setCount(0);
 
-//    stepper.calcTraj(0, 1000, 10);
-    Serial.println("Hello Wordl");
-//    Serial.println(stepper.getTimeConst());
-    stepper.setDir(HORARIO);
-    detecto = 0;
+ 
 }
 
 void loop() {
-
-    Serial.println(digitalRead(PIN_START_LINE));
-    if(detecto){	//Indica inicio de linea apretado
-     //   Serial.println("Inicio de linea - 2");
-       //     Serial.println(detecto);
-
-	}
-    else{
-        if(millis() - timer_2 > (10/2)){
-            moveStepper();
-            timer_2 = millis();
-        }
-
+   
+    if(!EG_isEmpty()){
+        byte_t event = (byte_t)(EG_getEvent());
+        Serial.println(event);
+        state = fsm(state, event);
+        state->actionState();
     }
-	
-    //stepper.setDir();
-
+    
     if(millis() - timer_1 > 100){
-        if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
-            detecto = 1;
-        //    Serial.println("Inicio de linea");
-        //    Serial.println(pasos/2);
-	    }
-        else{
-            detecto = 0;
-        }
-        
+        readEncoder();
+        readButtons();
+        timer_1 = millis();
     }
-
-
 
 }
 
 
-void moveStepper()
-{
-    if(!detecto){
-        stepper.sendStep();
-        pasos++;
-
+void readEncoder(void){
+    int64_t count = encoder.getCount();
+    if(count > 0){
+        EG_addExternEvent(ENCODER_RIGHT);
+        encoder.setCount(0);
     }
+    else if(count < 0){
+        EG_addExternEvent(ENCODER_LEFT);    
+        encoder.setCount(0);
+    }
+    
 }
-
 
 void readButtons(void){
 	if(encoderSwitch.getState() == PRESSED){

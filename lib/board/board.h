@@ -4,32 +4,38 @@
 /*******************************************************************************
  * CONEXION DE FINALES DE CARRERA
  ******************************************************************************/
-#define PIN_START_LINE      5
-#define PIN_END_LINE        18
+#define PIN_START_LINE      4
+#define PIN_END_LINE        5
+
+/*******************************************************************************
+ * CONEXION DE BOTON
+ ******************************************************************************/
+#define PIN_EMERGENCIA      36
+
 
 /*******************************************************************************
  * CONEXION DE MOTORES
  ******************************************************************************/
-#define PIN_MOTOR_DIR       19
-#define PIN_MOTOR_STEP      23
-#define PIN_MOTOR_EN        21
+#define PIN_MOTOR_DIR       21
+#define PIN_MOTOR_STEP      19
+#define PIN_MOTOR_EN        18
 
 /*******************************************************************************
  * CONEXION DE SENSORES
  ******************************************************************************/
-#define PIN_ENCODER_A         34
-#define PIN_ENCODER_B         35
-#define PIN_ENCODER_SW        22
+#define PIN_ENCODER_A         35
+#define PIN_ENCODER_B         34
+#define PIN_ENCODER_SW        39
 
 /*******************************************************************************
  * CONEXION DE DISPLAY
  ******************************************************************************/
 #define PIN_LCD_RS 32
 #define PIN_LCD_EN 33
-#define PIN_LCD_D4 27
-#define PIN_LCD_D5 14
-#define PIN_LCD_D6 25
-#define PIN_LCD_D7 13
+#define PIN_LCD_D4 25
+#define PIN_LCD_D5 26
+#define PIN_LCD_D6 27
+#define PIN_LCD_D7 14
 
 
 
