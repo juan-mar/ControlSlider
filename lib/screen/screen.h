@@ -77,6 +77,7 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define POSITIONS        " Xo:    Xf:    B"
 #define TIME_VEL         " T:   s V:   m/s"
 
+
 #define OFFSET_XF        7
 #define OFFSET_B         15
 #define OFFSET_VEL       7

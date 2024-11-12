@@ -73,22 +73,31 @@ void Motor::calcTraj(int x_o, int x_f, float time)
 }
 
 
-void Motor::enableMotor(bool en)
+void Motor::setEnableMotor(int en)
 {
-    if(en == ON)
-    {
-        digitalWrite(enPin, OFF);
-    }
-    else
-    {
-        digitalWrite(enPin, ON);
-    }
+    digitalWrite(enPin, en);
+    isEnableMotor = en;
 }
 
 void Motor::setDir(int dir_)
 {
     digitalWrite(dirPin, dir_);
 }
+
+void Motor::setMoreSteps(uint64_t steps)
+{
+    stepsRemainig += steps;
+}
+
+void Motor::setSteps(uint64_t steps)
+{
+    stepsRemainig = steps;
+}
+
+void Motor::setTimeConst(uint64_t time)
+{
+    timeConst = time;
+}   
 
 int Motor::getDir()
 {
@@ -129,6 +138,11 @@ int Motor::getTimeConst()
 
 uint64_t Motor::getStepsRemainig(){
     return stepsRemainig;
+}
+
+bool Motor::getEnableMotor()
+{
+    return isEnableMotor;
 }
 /*******************************************************************************
  *******************************************************************************

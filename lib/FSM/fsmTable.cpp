@@ -318,7 +318,7 @@ static menu_items_t set_manually_items = {{{0, EDIT_PARTS,EDIT_PARTS_COL, EDIT_P
 										  0, 4};
 
 static menu_items_t edit_parts_items = {{{0, SELEC_DIS, SEL_DIS_COL, SEL_DIS_FIL},
-										  {1, SELEC_DELTA_T, SEL_DELTA_COL, SEL_DELTA_FIL},
+										 {1, SELEC_DELTA_T, SEL_DELTA_COL, SEL_DELTA_FIL},
 										 {2, BACK, BACK_COL, BACK_FIL}}, 
 										  0, 3};
 

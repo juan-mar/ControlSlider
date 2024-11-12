@@ -2,6 +2,8 @@
 #include "slider.h"
 #include "Stepper.h"
 
+static Slider slider;
+
 Slider::Slider(){
     numTramos = 1;
     esLoop = false;
@@ -51,3 +53,4 @@ double Slider::getXf(int tramo){
 double Slider::getTiempo(int tramo){
     return tiemposTramos[tramo];
 }
+

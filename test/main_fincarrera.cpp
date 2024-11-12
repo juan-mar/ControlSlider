@@ -9,9 +9,12 @@
 #include "Button.h" 
 #include "ESP32Encoder.h"
 
-int detecto = 0;
+int detectoIni = 0;
+int detectoFin = 0;
+bool sendAvailable = false;
 int paso_n1 = 0;
 int paso_n2 = 0;
+int paso_n3 = 0;
 uint64_t pasos = 0;
 uint64_t timer_1 = 0;
 uint64_t timer_2 = 0;
@@ -21,7 +24,7 @@ void moveStepper(void);
 
 Motor stepper(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_HIGH);
-Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
+Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
 Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
 
  
@@ -32,84 +35,100 @@ void setup() {
     Serial.println("Hello Wordl");
 //    Serial.println(stepper.getTimeConst());
     stepper.setDir(HORARIO);
-    detecto = 0;
+    Serial.println("HORARIO");
+    stepper.enableMotor(ON);
+
+    detectoIni = 0;
+    detectoFin = 0;
+    paso_n1 = 1;
+    pasos = 0;
 }
 
 void loop() {
 
     //Primero busco estar en inicio de linea
-    if (paso_n1 == 1 && detecto == 0){
+    //Serial.println(detecto);
+    
+    //Secuencia para detectar inicio de carrera, esperar 1 segungo
+    // y luego moverse en sentido antihorario hasta el fin de linea
+    //contando los pasos.
+    //Si detecta fin de carrera, se detiene y muestra la cantidad de pasos
+
+    if(detectoIni == 0 && paso_n1 == 1){
+        //stepper.sendStep();
+        sendAvailable = true;
+    }
+    else if(detectoIni == 1 && paso_n1 == 1){
+        stepper.enableMotor(OFF);
+        paso_n1 = 0;
+        paso_n2 = 1;
+        stepper.setDir(ANTIHORARIO);
+        Serial.println("AntiHorario");
+        sendAvailable = false;  
+        delay(1000);
+        stepper.enableMotor(ON);
+    }
+
+    if(detectoFin == 0 && paso_n2 == 1){
+        //stepper.sendStep();
+        sendAvailable = true;
+    }
+    else if(detectoFin == 1 && paso_n2 == 1){
+        sendAvailable = false;  
+        stepper.enableMotor(OFF);
+        paso_n2 = 0;
+        paso_n3 = 1;
+        Serial.println("Fin de carrera");
+        Serial.println(pasos);
+        delay(1000);
+        pasos = 0;
         stepper.setDir(HORARIO);
         stepper.enableMotor(ON);
-        paso_n2 = 0;
-    }
-    else{
-        /* code */
+        Serial.println("Horario");
+        sendAvailable = true;
     }
     
-
-
-
-    if(inicioDeLinea.getState() == PRESS){
-        //estoy en inicio de linea
-        detecto = 1;
-        delay(1000); //freno
-        stepper.setDir(ANTIHORARIO);
+    if(detectoIni == 1 && paso_n3 == 1){
+        stepper.enableMotor(OFF);
+        paso_n3 = 0;
+        sendAvailable = false;
+        Serial.println("Fin de carrera");
+        Serial.println(pasos);  
+        delay(1000);
     }
-    else{
-        detecto = 0;
-
-    }
-
-
-
-    Serial.println(digitalRead(PIN_START_LINE));
-    if(detecto){	//Indica inicio de linea apretado
-     //   Serial.println("Inicio de linea - 2");
-       //     Serial.println(detecto);
-
-	}
-    else{
-        if(millis() - timer_2 > (10/2)){
-            moveStepper();
-            timer_2 = millis();
-        }
-
-    }
-	
-    //stepper.setDir();
-
+  
+    
     if(millis() - timer_1 > 100){
         if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
-            detecto = 1;
+            detectoIni = 1; //Apretado
         }
         else{
-            detecto = 0;
-        }        
+            detectoIni = 0; //NO apretado
+        }     
+        if(finDeLinea.getState() == PRESS){	//Indica fin de linea apretado
+            detectoFin = 1;
+        }
+        else{
+            detectoFin = 0;
+        }   
     }
 
 
-
-}
-
-
-void moveStepper()
-{
-    if(paso_n1 == 1 && detecto == 0){
-        stepper.sendStep();
+    if(sendAvailable){
+        if(millis() - timer_2 > 200){
+            stepper.sendStep();
+            if(paso_n2 == 1){
+                Serial.println(pasos);
+                pasos++;
+            }
+            if(paso_n3 == 1){
+                pasos++;
+                Serial.println(pasos);
+            }
+            timer_2 = millis();
+        }   
     }
-    
 }
 
 
-void readButtons(void){
-	if(encoderSwitch.getState() == PRESSED){
-        EG_addExternEvent(ENCODER_SWITCH);
-	}
-	if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
-        EG_addExternEvent(INIT_OF_LINE);
-	}	
-	if(finDeLinea.getState() == PRESS){	//Indica fin de linea apretado
-        EG_addExternEvent(END_OF_LINE);
-	}
-}
+

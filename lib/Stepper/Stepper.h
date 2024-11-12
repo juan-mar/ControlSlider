@@ -37,16 +37,21 @@ public:
     //Destructor
     ~Motor();
 
-
-    void calcTraj(int x_o, int x_f, float time);      //Funcion para calcular la velocidad
-    void enableMotor(bool en);                      //Funcion para habilitar el motor
-    void setDir(int dir);                          //Funcion para cambiar la direccion
-    int getDir();                                  //Funcion para obtener la direccion
     bool isMoving();                                //Funcion para obtener el estado del motor
-    void sendStep();                              //Funcion para mover el motor
+    void calcTraj(int x_o, int x_f, float time);      //Funcion para calcular la velocidad
+    void setEnableMotor(int en);                      //Funcion para habilitar el motor
+    void setDir(int dir);                          //Funcion para cambiar la direccion
+    void setMoreSteps(uint64_t steps);              //Funcion para agregar pasos
+    void setSteps(uint64_t steps);                  //Funcion para setear pasos
+    void setTimeConst(uint64_t time);               //Funcion para setear la constante de tiempo
+
+    int getDir();
+    bool getEnableMotor();                                  //Funcion para obtener la direccion
     int getTimeConst();  
     uint64_t getStepsRemainig();                           //Funcion para obtener la constante de tiempo
-
+    
+    void sendStep();                              //Funcion para mover el motor
+    
 
 private:
     int stepPin;
@@ -55,6 +60,7 @@ private:
     int stepsRemainig;
     int enPin;
     int timeConst;
+    int isEnableMotor;
 
 
 };

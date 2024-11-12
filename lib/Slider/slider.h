@@ -35,4 +35,9 @@ private:
    
 };
 
+
+// Function to get the slider
+Slider * get_slider();
+
+
 #endif // SLIDER_H

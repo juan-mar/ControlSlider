@@ -58,5 +58,4 @@ void Timer0_ISR(void){
 void moveStepper()
 {
     stepper.sendStep();
-//    Serial.println(stepper.getStepsRemainig());
 }
