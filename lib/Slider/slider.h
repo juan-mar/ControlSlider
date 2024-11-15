@@ -18,20 +18,21 @@ public:
 
 
     void agregarTramo(double x0, double xf, double tiempo = 10);
-    void borrarTramo(int tramo);
     void borrarUltimoTramo();
-    void modificarTramo(int tramo, double x0, double xf, double tiempo = 10);
+    void modificarTramo(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo);
     
 
     //Funcion para leer la distancia de un tramo
-    double getX0(int tramo);
-    double getXf(int tramo);
+    uint64_t getX0(int tramo);
+    uint64_t getXf(int tramo);
     //Funcion para leer el tiempo del tramo 
-    double getTiempo(int tramo);
+    uint64_t getTiempo(int tramo);
 
 private:
-    std::vector<std::array<double, 2>> distanciasTramos;
-    std::vector<double> tiemposTramos;
+    uint64_t distanciasTramos[5][2];
+//    std::vector<std::array<double, 2>> distanciasTramos;
+    uint64_t tiemposTramos[5];    
+//    std::vector<double> tiemposTramos;
    
 };
 

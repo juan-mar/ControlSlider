@@ -9,6 +9,7 @@
 #include "EventGenerator.h"
 #include "ESP32Encoder.h"
 #include "Stepper.h"
+#include "slider.h"
 
 //sensores 
 ESP32Encoder encoder;
@@ -19,7 +20,7 @@ Button emergencia = Button(PIN_EMERGENCIA, ACT_HIGH);
 bool paradaEmergencia = false;
 
 Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
-
+Slider slider;
 void readEncoder();
 void readButtons(void);
 void rutinaEmergencia();
@@ -79,17 +80,13 @@ void loop() {
     //Mover motor
     /*
         Si tenemos vector listo y se dio a Run. 
-        
+
     */
+    rutinaRun();
 
 
-    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
-        if(stepper.getStepsRemainig()){
-            stepper.sendStep();
-        }
-        timer_2 = micros();
-    }
 
+    
 }
 
 
@@ -197,4 +194,68 @@ void rutinaEmergencia(){
             break;
         }
     }
+}
+
+
+
+void rutinaRun(){
+    static int tramos_faltantes = slider.numTramos;
+    static int go_origin = 1;
+    static int go_X0 = 0;
+    static int currentTramo = 0;
+    static int cantTramos = slider.numTramos;
+    static int newTramo = 1;
+
+    if(go_origin){
+        stepper.setDir(HORARIO);
+        stepper.setEnableMotor(ON);
+        while(inicioDeLinea.getState() == NOT_PRESSED){
+            if(micros() - timer_2 > (1000/2)){
+                stepper.sendStep();
+                timer_2 = micros();
+            }
+        }
+
+        stepper.setStepCurrent(0);
+        //stepper.setEnableMotor(ON);
+        stepper.setDir(ANTIHORARIO);
+        uint64_t x0_ = slider.getX0(0);
+
+        //Go to Initial Position
+        while(stepper.getStepCurr() < x0_){
+            if(micros() - timer_2 > (1000/2)){
+                stepper.sendStep();
+                timer_2 = micros();
+            }
+        }
+        go_origin = 0;
+    }
+
+
+    //Realizar el Tramo 1
+        
+
+    if(newTramo){
+        //Estoy en tramo current
+        stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo), 
+                                        slider.getTiempo(currentTramo));
+    }    
+
+//    if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
+    if(stepper.getStepsRemainig()){
+        newTramo = 0;
+    }
+    else{
+        //Estoy en tramo siguiente
+        currentTramo++;
+        newTramo = 1;
+    }
+    
+    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
+        if(stepper.getStepsRemainig()){
+            stepper.sendStep();
+        }
+        timer_2 = micros();
+    }                         
+
 }

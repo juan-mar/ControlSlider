@@ -44,11 +44,13 @@ public:
     void setMoreSteps(uint64_t steps);              //Funcion para agregar pasos
     void setSteps(uint64_t steps);                  //Funcion para setear pasos
     void setTimeConst(uint64_t time);               //Funcion para setear la constante de tiempo
+    void setStepCurrent(uint64_t step);
 
     int getDir();
     bool getEnableMotor();                                  //Funcion para obtener la direccion
     int getTimeConst();  
-    uint64_t getStepsRemainig();                           //Funcion para obtener la constante de tiempo
+    uint64_t getStepsRemainig();
+    uint64_t getStepCurr();                          //Funcion para obtener la constante de tiempo
     
     void sendStep();                              //Funcion para mover el motor
     
@@ -61,7 +63,7 @@ private:
     int enPin;
     int timeConst;
     int isEnableMotor;
-
+    uint64_t stepsCurrent;
 
 };
 

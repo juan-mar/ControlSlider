@@ -56,6 +56,8 @@ Motor::Motor(int step, int dir, int en)
     
     digitalWrite(enPin, ON);
     digitalWrite(dirPin, HIGH);
+
+    stepsCurrent = 0;
    
 }
 
@@ -69,7 +71,7 @@ void Motor::calcTraj(int x_o, int x_f, float time)
 {
     stepsRemainig = abs(x_f - x_o);
     speed = stepsRemainig/(time*1000);                     //me da en pasos por ms
-    timeConst = 1000 * time/stepsRemainig;                 //tiempo entre pasos en ms
+    timeConst = (1000*1000 * time)/stepsRemainig;                 //tiempo entre pasos en MICROS
 }
 
 
@@ -99,10 +101,17 @@ void Motor::setTimeConst(uint64_t time)
     timeConst = time;
 }   
 
+
+void Motor::setStepCurrent(uint64_t step)
+{
+    stepsCurrent = step;
+}
+
 int Motor::getDir()
 {
     return digitalRead(dirPin);
 }   
+
 
 bool Motor::isMoving()
 {
@@ -119,16 +128,22 @@ bool Motor::isMoving()
 void Motor::sendStep() //cuidado a la mitad de los tiempos tiene que llamarse esta funcion
 {
     //digitalWrite(stepPin, !digitalRead(stepPin));
-    
     if( digitalRead(stepPin) == LOW)
     {
-        digitalWrite(stepPin, HIGH);
         stepsRemainig--;
+        if(digitalRead(dirPin) == HORARIO){
+            stepsCurrent--;
+        }
+        else{
+            stepsCurrent++;
+        }
+        digitalWrite(stepPin, HIGH);
     }
     else
     {
         digitalWrite(stepPin, LOW);
     }
+
 }
 
 int Motor::getTimeConst()
@@ -143,6 +158,11 @@ uint64_t Motor::getStepsRemainig(){
 bool Motor::getEnableMotor()
 {
     return isEnableMotor;
+}
+
+uint64_t Motor::getStepCurr()
+{
+    return stepsCurrent;
 }
 /*******************************************************************************
  *******************************************************************************

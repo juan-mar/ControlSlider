@@ -14,8 +14,8 @@
 //sensores 
 ESP32Encoder encoder;
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_LOW);
-Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
-Button finDeLinea = Button(PIN_END_LINE, ACT_HIGH);
+Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
+Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
 Button emergencia = Button(PIN_EMERGENCIA, ACT_HIGH);
 bool paradaEmergencia = false;
 
@@ -24,14 +24,11 @@ Slider slider;
 void readEncoder();
 void readButtons(void);
 void rutinaEmergencia();
-void rutinaRun();
 
 
 //timers
 uint64_t timer_1 = 0;
 uint64_t timer_2 = 0;
-
-uint64_t timer_3 = 0;
 
 //Cola de enventos
 #define MAX_EVENT   100
@@ -55,7 +52,7 @@ void setup() {
     stepper.setEnableMotor(ON);
     stepper.setSteps(0);
 
-    slider.modificarTramo(0,1000,10000,20);
+    slider.modificarTramo(0,1000,5000,20);
 
  
 }
@@ -85,12 +82,6 @@ void loop() {
         timer_1 = millis();
     }
 
-    if(millis() - timer_3 > 500){
-        Serial.println(stepper.getStepCurr());
-        timer_3 = millis();
-    }
-
-    
     //Mover motor
     rutinaRun();
 
@@ -215,7 +206,6 @@ void rutinaRun(){
     static int newTramo = 1;
 
     if(go_origin){
-        show_screen("Yendo a inicio", "Moviendo motor");
         stepper.setDir(HORARIO);
         stepper.setEnableMotor(ON);
         while(inicioDeLinea.getState() == NOT_PRESSED){
@@ -224,12 +214,11 @@ void rutinaRun(){
                 timer_2 = micros();
             }
         }
-        delay(500);
+
         stepper.setStepCurrent(0);
         //stepper.setEnableMotor(ON);
         stepper.setDir(ANTIHORARIO);
         uint64_t x0_ = slider.getX0(0);
-        show_screen("Yendo a x0", "Moviendo motor");
 
         //Go to Initial Position
         while(stepper.getStepCurr() < x0_){
@@ -238,19 +227,21 @@ void rutinaRun(){
                 timer_2 = micros();
             }
         }
-        delay(500);
         go_origin = 0;
     }
-    
-    stepper.setDir(ANTIHORARIO);
 
-    if(newTramo){   
+
+    //Realizar el Tramo 1
+        
+
+    if(newTramo){
         //Estoy en tramo current
         stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
     }    
-    if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
-//    if(stepper.getStepsRemainig()){
+
+//    if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
+    if(stepper.getStepsRemainig()){
         newTramo = 0;
     }
     else{
@@ -260,11 +251,8 @@ void rutinaRun(){
     }
     
     if(micros() - timer_2 > (stepper.getTimeConst()/2)){
-        if(stepper.getStepCurr() < slider.getXf(currentTramo)){
+        if(stepper.getStepsRemainig()){
             stepper.sendStep();
-        }
-        else{
-            stepper.setEnableMotor(OFF);
         }
         timer_2 = micros();
     }                         

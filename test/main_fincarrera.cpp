@@ -15,7 +15,8 @@ bool sendAvailable = false;
 int paso_n1 = 0;
 int paso_n2 = 0;
 int paso_n3 = 0;
-uint64_t pasos = 0;
+uint64_t pasosIda = 0;
+uint64_t pasosVuelta = 0;
 uint64_t timer_1 = 0;
 uint64_t timer_2 = 0;
 void readButtons(void);
@@ -41,7 +42,8 @@ void setup() {
     detectoIni = 0;
     detectoFin = 0;
     paso_n1 = 1;
-    pasos = 0;
+    pasosIda = 0;
+    pasosVuelta = 0;
 }
 
 void loop() {
@@ -80,9 +82,9 @@ void loop() {
         paso_n2 = 0;
         paso_n3 = 1;
         Serial.println("Fin de carrera");
-        Serial.println(pasos);
+        Serial.println(pasosIda);
         delay(1000);
-        pasos = 0;
+        //pasos = 0;
         stepper.setDir(HORARIO);
         stepper.setEnableMotor(ON);
         Serial.println("Horario");
@@ -94,7 +96,7 @@ void loop() {
         paso_n3 = 0;
         sendAvailable = false;
         Serial.println("Fin de carrera");
-        Serial.println(pasos);  
+        Serial.println(pasosVuelta);  
         delay(1000);
     }
   
@@ -119,12 +121,12 @@ void loop() {
         if(micros() - timer_2 >1000){
             stepper.sendStep();
             if(paso_n2 == 1){
-                Serial.println(pasos);
-                pasos++;
+                Serial.println(pasosIda);
+                pasosIda++;
             }
             if(paso_n3 == 1){
-                pasos++;
-                Serial.println(pasos);
+                pasosVuelta++;
+                Serial.println(pasosVuelta);
             }
             timer_2 = micros();
         }   
