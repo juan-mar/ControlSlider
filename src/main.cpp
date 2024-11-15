@@ -85,7 +85,8 @@ void loop() {
         timer_1 = millis();
     }
 
-    if(millis() - timer_3 > 500){
+    if(millis() - timer_3 > 50){
+        disp_write_number(stepper.getStepCurr(),0,1);
         Serial.println(stepper.getStepCurr());
         timer_3 = millis();
     }
@@ -246,6 +247,7 @@ void rutinaRun(){
 
     if(newTramo){   
         //Estoy en tramo current
+        show_screen("Moviendo motor", BLANK);
         stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
     }    

@@ -465,7 +465,7 @@ static void delete_part(void) {
 static void show_part_to_edit(void) {
 	show_screen(PARTS, ADD_DEL);
 	show_curs(SEL_PART_COL, SEL_PART_FIL);
-	disp_write('0'+part_to_edit, NUN_PARTS_COL, SEL_PART_FIL);
+	//disp_write('0'+part_to_edit, NUN_PARTS_COL, SEL_PART_FIL);
 
 }
 
