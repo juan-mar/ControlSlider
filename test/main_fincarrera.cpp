@@ -24,8 +24,8 @@ void moveStepper(void);
 
 Motor stepper(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_HIGH);
-Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
-Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
+Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
+Button finDeLinea = Button(PIN_END_LINE, ACT_HIGH);
 
  
 void setup() {
@@ -36,7 +36,7 @@ void setup() {
 //    Serial.println(stepper.getTimeConst());
     stepper.setDir(HORARIO);
     Serial.println("HORARIO");
-    stepper.enableMotor(ON);
+    stepper.setEnableMotor(ON);
 
     detectoIni = 0;
     detectoFin = 0;
@@ -45,6 +45,7 @@ void setup() {
 }
 
 void loop() {
+
 
     //Primero busco estar en inicio de linea
     //Serial.println(detecto);
@@ -59,14 +60,14 @@ void loop() {
         sendAvailable = true;
     }
     else if(detectoIni == 1 && paso_n1 == 1){
-        stepper.enableMotor(OFF);
+        stepper.setEnableMotor(OFF);
         paso_n1 = 0;
         paso_n2 = 1;
         stepper.setDir(ANTIHORARIO);
         Serial.println("AntiHorario");
         sendAvailable = false;  
         delay(1000);
-        stepper.enableMotor(ON);
+        stepper.setEnableMotor(ON);
     }
 
     if(detectoFin == 0 && paso_n2 == 1){
@@ -75,7 +76,7 @@ void loop() {
     }
     else if(detectoFin == 1 && paso_n2 == 1){
         sendAvailable = false;  
-        stepper.enableMotor(OFF);
+        stepper.setEnableMotor(OFF);
         paso_n2 = 0;
         paso_n3 = 1;
         Serial.println("Fin de carrera");
@@ -83,13 +84,13 @@ void loop() {
         delay(1000);
         pasos = 0;
         stepper.setDir(HORARIO);
-        stepper.enableMotor(ON);
+        stepper.setEnableMotor(ON);
         Serial.println("Horario");
         sendAvailable = true;
     }
     
     if(detectoIni == 1 && paso_n3 == 1){
-        stepper.enableMotor(OFF);
+        stepper.setEnableMotor(OFF);
         paso_n3 = 0;
         sendAvailable = false;
         Serial.println("Fin de carrera");
@@ -115,7 +116,7 @@ void loop() {
 
 
     if(sendAvailable){
-        if(millis() - timer_2 > 200){
+        if(micros() - timer_2 >1000){
             stepper.sendStep();
             if(paso_n2 == 1){
                 Serial.println(pasos);
@@ -125,7 +126,7 @@ void loop() {
                 pasos++;
                 Serial.println(pasos);
             }
-            timer_2 = millis();
+            timer_2 = micros();
         }   
     }
 }

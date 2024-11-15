@@ -1,197 +1,145 @@
 #include <Arduino.h>
-#include "CircularBuffer.h"
+#include "EventGenerator.h"
 #include "fsm.h"
 #include "fsmTable.h"
 #include "screen.h"
 #include "Display.h"
-#include "board.h"
-#include "Button.h"
-#include "EventGenerator.h"
-#include "ESP32Encoder.h"
 #include "Stepper.h"
+#include "board.h"
+#include "Button.h" 
+#include "ESP32Encoder.h"
 
-//sensores 
-ESP32Encoder encoder;
-Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_LOW);
-Button inicioDeLinea = Button(PIN_START_LINE, ACT_LOW);
-Button finDeLinea = Button(PIN_END_LINE, ACT_LOW);
-Button emergencia = Button(PIN_EMERGENCIA, ACT_HIGH);
-bool paradaEmergencia = false;
-
-Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
-
-void readEncoder();
-void readButtons(void);
-void rutinaEmergencia();
-
-
-//timers
+int detectoIni = 0;
+int detectoFin = 0;
+bool sendAvailable = false;
+bool endCal = false;
+int paso_n1 = 0;
+int paso_n2 = 0;
+int paso_n3 = 0;
+uint64_t pasos = 0;
 uint64_t timer_1 = 0;
 uint64_t timer_2 = 0;
+void readButtons(void);
 
-//Cola de enventos
-#define MAX_EVENT   100
+void moveStepper(void);
 
-//State machine
-state_t state;
+void rutinaCalibracion();
+Motor stepper(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
+Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_HIGH);
+Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
+Button finDeLinea = Button(PIN_END_LINE, ACT_HIGH);
 
+ 
 void setup() {
     Serial.begin(115200);
-    
-    EG_init();
-    state = FSM_GetInitState();
-    EG_addExternEvent(NONE);
-    InitDisp();
-    show_screen("Hello World.....", BLANK);
-    //show_curs(0, 1);
-    
-    //Set up encoder
-    encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
-	encoder.setCount(0);
+
+//    stepper.calcTraj(0, 1000, 10);
+    Serial.println("Hello Wordl");
+//    Serial.println(stepper.getTimeConst());
+    stepper.setDir(HORARIO);
+    Serial.println("HORARIO");
     stepper.setEnableMotor(ON);
-    stepper.setSteps(0);
- 
+
+    detectoIni = 0;
+    detectoFin = 0;
+    paso_n1 = 1;
+    pasos = 0;
 }
 
 void loop() {
+    rutinaCalibracion();
 
-    //si no hay emergencia
-    if(paradaEmergencia == false){ 
-        if(!EG_isEmpty()){
-            byte_t event = (byte_t)(EG_getEvent());
-            Serial.println(event);
-            state = fsm(state, event);
-            state->actionState();
-        }
+    if(endCal == true){
+        stepper.setEnableMotor(OFF);
+        stepper.setDir(ANTIHORARIO);
+        stepper.setEnableMotor(ON);
+        stepper.setSteps(pasos/2);
+        endCal = false;
+        sendAvailable = true;
     }
-    else{
-        //codigo de emergencia
-        rutinaEmergencia();       
+
+}
+
+
+void rutinaCalibracion(){
+    //rutina de calibracion
+    //mover motor en sentido horario hasta que se
+    if(detectoIni == 0 && paso_n1 == 1){
+        //stepper.sendStep();
+        sendAvailable = true;
     }
-   
-   
+    else if(detectoIni == 1 && paso_n1 == 1){
+        stepper.setEnableMotor(OFF);
+        paso_n1 = 0;
+        paso_n2 = 1;
+        stepper.setDir(ANTIHORARIO);
+        Serial.println("AntiHorario");
+        sendAvailable = false;  
+        delay(1000);
+        stepper.setEnableMotor(ON);
+    }
 
+    if(detectoFin == 0 && paso_n2 == 1){
+        //stepper.sendStep();
+        sendAvailable = true;
+    }
+    else if(detectoFin == 1 && paso_n2 == 1){
+        sendAvailable = false;  
+        stepper.setEnableMotor(OFF);
+        paso_n2 = 0;
+        paso_n3 = 1;
+        Serial.println("Fin de carrera");
+        Serial.println(pasos);
+        delay(1000);
+        pasos = 0;
+        stepper.setDir(HORARIO);
+        stepper.setEnableMotor(ON);
+        Serial.println("Horario");
+        sendAvailable = true;
+    }
+    
+    if(detectoIni == 1 && paso_n3 == 1){
+        stepper.setEnableMotor(OFF);
+        paso_n3 = 0;
+        sendAvailable = false;
+        Serial.println("Fin de carrera");
+        Serial.println(pasos);  
+        delay(1000);
+        endCal = true;
 
-
+    }
+  
+    
     if(millis() - timer_1 > 100){
-        readEncoder();
-        readButtons();
-        timer_1 = millis();
+        if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
+            detectoIni = 1; //Apretado
+        }
+        else{
+            detectoIni = 0; //NO apretado
+        }     
+        if(finDeLinea.getState() == PRESS){	//Indica fin de linea apretado
+            detectoFin = 1;
+        }
+        else{
+            detectoFin = 0;
+        }   
     }
 
-    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
-        if(stepper.getStepsRemainig()){
+
+    if(sendAvailable){
+        if(micros() - timer_2 > 1000/2){
             stepper.sendStep();
-        }
-        timer_2 = micros();
+            if(paso_n2 == 1){
+                Serial.println(pasos);
+                pasos++;
+            }
+            if(paso_n3 == 1){
+                pasos++;
+                Serial.println(pasos);
+            }
+            timer_2 = micros();
+        }   
     }
 
 
-}
-
-
-void readEncoder(void){
-    int64_t count = encoder.getCount();
-    if(count > 0){
-        EG_addExternEvent(ENCODER_RIGHT);
-        encoder.setCount(0);
-    }
-    else if(count < 0){
-        EG_addExternEvent(ENCODER_LEFT);    
-        encoder.setCount(0);
-    }
-    
-}
-
-void readButtons(void){
-	if(encoderSwitch.getState() == PRESSED){
-        EG_addExternEvent(ENCODER_SWITCH);
-	}
-    
-    /*
-    if(inicioDeLinea.getState() == PRESS){	//Indica inicio de linea apretado
-        EG_addExternEvent(INIT_OF_LINE);
-	}	
-	if(finDeLinea.getState() == PRESS){	//Indica fin de linea apretado
-        EG_addExternEvent(END_OF_LINE);
-	}
-    */
-	
-    if(emergencia.getState() == PRESS && paradaEmergencia == false){
-        paradaEmergencia = true;
-        EG_addExternEvent(NONE);
-    }
-
-    static uint64_t restartProgram = 0;
-    if(emergencia.getState() == PRESS && paradaEmergencia == true){
-        restartProgram++;
-        if(restartProgram == 10*5){
-            EG_addExternEvent(NONE);
-            paradaEmergencia = false;
-            restartProgram = 0;
-            show_screen("Reiniciando...  ","Soltar boton    ");
-            delay(3000);
-        }
-    }
-    
-}
-
-void rutinaEmergencia(){
-    /*
-        if(emergencia.getState() == PRESS){
-            paradaEmergencia = false;
-            EG_addExternEvent(NONE);
-            stepper.setSteps(0);
-
-        }
-    */
-    
-    if(!EG_isEmpty()){
-        byte_t event = (byte_t)(EG_getEvent());
-        switch (event){
-        case ENCODER_SWITCH:
-            if(stepper.getEnableMotor() == OFF){
-                stepper.setEnableMotor(ON);
-                show_screen("Parada|Motor:ON ", "Motor -> encoder");
-            }
-            else{
-                stepper.setEnableMotor(OFF);
-                show_screen("Parada|Motor:OFF", "Presione encoder");
-                stepper.setSteps(0);
-                stepper.setTimeConst(1000);
-            }
-            break;
-        case ENCODER_LEFT:
-            if(stepper.getEnableMotor() == ON){
-                stepper.setDir(ANTIHORARIO);
-                stepper.setMoreSteps(50);
-            }
-            break;
-        case ENCODER_RIGHT:
-            if(stepper.getEnableMotor() == ON){
-                stepper.setDir(HORARIO);
-                stepper.setMoreSteps(50);
-            }
-            break;
-        case INIT_OF_LINE:
-            if(stepper.getEnableMotor() == ON && stepper.getDir() == HORARIO){  
-                stepper.setSteps(0);
-            }
-            break;
-        case END_OF_LINE:
-            if(stepper.getEnableMotor() == ON && stepper.getDir() == ANTIHORARIO){
-                stepper.setSteps(0);
-            }
-            break;
-        case NONE:
-            show_screen("Parada|Motor:OFF", BLANK);
-            stepper.setEnableMotor(OFF);
-            stepper.setSteps(0);
-            stepper.setTimeConst(1000);
-            break;
-
-        default:
-            break;
-        }
-    }
 }

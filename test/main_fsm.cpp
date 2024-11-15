@@ -48,47 +48,48 @@ void setup() {
     //Set up encoder
     encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
 	encoder.setCount(0);
+    stepper.setEnableMotor(ON);
+    stepper.setSteps(0);
  
 }
 
 void loop() {
-   /*
+
     //si no hay emergencia
     if(paradaEmergencia == false){ 
-       
-
-
+        if(!EG_isEmpty()){
+            byte_t event = (byte_t)(EG_getEvent());
+            Serial.println(event);
+            state = fsm(state, event);
+            state->actionState();
+        }
     }
     else{
         //codigo de emergencia
         rutinaEmergencia();       
     }
    
-   */
-   
-    if(!EG_isEmpty()){
-        byte_t event = (byte_t)(EG_getEvent());
-        Serial.println(event);
-        state = fsm(state, event);
-        state->actionState();
-    }
-
-
-
+    //Lectura de encoder y botones
     if(millis() - timer_1 > 100){
         readEncoder();
         readButtons();
         timer_1 = millis();
     }
-/*
-    if(millis() - timer_2 > (stepper.getTimeConst()/2)){
+
+    //Mover motor
+    /*
+        Si tenemos vector listo y se dio a Run. 
+        
+    */
+
+
+    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
         if(stepper.getStepsRemainig()){
             stepper.sendStep();
         }
-        timer_2 = millis();
+        timer_2 = micros();
     }
 
-*/
 }
 
 
@@ -121,44 +122,58 @@ void readButtons(void){
 	
     if(emergencia.getState() == PRESS && paradaEmergencia == false){
         paradaEmergencia = true;
-        //EG_addExternEvent(NONE);
+        EG_addExternEvent(NONE);
+    }
+
+    static uint64_t restartProgram = 0;
+    if(emergencia.getState() == PRESS && paradaEmergencia == true){
+        restartProgram++;
+        if(restartProgram == 10*5){
+            EG_addExternEvent(NONE);
+            paradaEmergencia = false;
+            restartProgram = 0;
+            show_screen("Reiniciando...  ","Soltar boton    ");
+            delay(3000);
+        }
     }
     
 }
 
 void rutinaEmergencia(){
-    if(emergencia.getState() == PRESSED){
-        paradaEmergencia = false;
-        EG_addExternEvent(NONE);
-        stepper.setSteps(0);
+    /*
+        if(emergencia.getState() == PRESS){
+            paradaEmergencia = false;
+            EG_addExternEvent(NONE);
+            stepper.setSteps(0);
 
-    }
-
+        }
+    */
+    
     if(!EG_isEmpty()){
         byte_t event = (byte_t)(EG_getEvent());
         switch (event){
         case ENCODER_SWITCH:
             if(stepper.getEnableMotor() == OFF){
-                stepper.enableMotor(ON);
+                stepper.setEnableMotor(ON);
                 show_screen("Parada|Motor:ON ", "Motor -> encoder");
             }
             else{
-                stepper.enableMotor(OFF);
+                stepper.setEnableMotor(OFF);
                 show_screen("Parada|Motor:OFF", "Presione encoder");
                 stepper.setSteps(0);
-                stepper.setTimeConst(500);
+                stepper.setTimeConst(1000);
             }
             break;
         case ENCODER_LEFT:
             if(stepper.getEnableMotor() == ON){
                 stepper.setDir(ANTIHORARIO);
-                stepper.setMoreSteps(100);
+                stepper.setMoreSteps(50);
             }
             break;
         case ENCODER_RIGHT:
             if(stepper.getEnableMotor() == ON){
                 stepper.setDir(HORARIO);
-                stepper.setMoreSteps(100);
+                stepper.setMoreSteps(50);
             }
             break;
         case INIT_OF_LINE:
@@ -173,9 +188,9 @@ void rutinaEmergencia(){
             break;
         case NONE:
             show_screen("Parada|Motor:OFF", BLANK);
-            stepper.enableMotor(OFF);
+            stepper.setEnableMotor(OFF);
             stepper.setSteps(0);
-            stepper.setTimeConst(500);
+            stepper.setTimeConst(1000);
             break;
 
         default:
