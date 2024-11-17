@@ -73,7 +73,8 @@ void loop() {
     }
     else{
         //codigo de emergencia
-        rutinaEmergencia();       
+        rutinaEmergencia();   
+            
     }
 
 */
@@ -85,6 +86,7 @@ void loop() {
         timer_1 = millis();
     }
 
+
     if(millis() - timer_3 > 50){
         disp_write_number(stepper.getStepCurr(),0,1);
         Serial.println(stepper.getStepCurr());
@@ -95,8 +97,13 @@ void loop() {
     //Mover motor
     rutinaRun();
 
-
-
+    if(stepper.getStepsRemainig()){
+        if(micros() - timer_2 > (1000/2)){
+            stepper.sendStep();
+            timer_2 = micros();
+        }
+    }
+    //updateMotorSlider();
     
 }
 
@@ -219,31 +226,43 @@ void rutinaRun(){
         show_screen("Yendo a inicio", "Moviendo motor");
         stepper.setDir(HORARIO);
         stepper.setEnableMotor(ON);
-        while(inicioDeLinea.getState() == NOT_PRESSED){
+        if(inicioDeLinea.getState() == NOT_PRESSED){
             if(micros() - timer_2 > (1000/2)){
                 stepper.sendStep();
                 timer_2 = micros();
             }
         }
-        delay(500);
-        stepper.setStepCurrent(0);
+        else{
+            delay(500);
+            go_origin = 0;
+            go_X0 = 1;
+            stepper.setStepCurrent(0);
+        }
+
+    }
+    
         //stepper.setEnableMotor(ON);
+    if(go_X0){
         stepper.setDir(ANTIHORARIO);
         uint64_t x0_ = slider.getX0(0);
         show_screen("Yendo a x0", "Moviendo motor");
 
         //Go to Initial Position
-        while(stepper.getStepCurr() < x0_){
+        if(stepper.getStepCurr() < x0_){
             if(micros() - timer_2 > (1000/2)){
                 stepper.sendStep();
                 timer_2 = micros();
             }
         }
-        delay(500);
-        go_origin = 0;
+        else{
+            delay(500);
+            go_X0 = 0;
+            go_origin = 0;
+        }
+        
     }
     
-    stepper.setDir(ANTIHORARIO);
+    //stepper.setDir(ANTIHORARIO);
 
     if(newTramo){   
         //Estoy en tramo current

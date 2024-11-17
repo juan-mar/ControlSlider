@@ -80,7 +80,6 @@ void loop() {
     //Mover motor
     /*
         Si tenemos vector listo y se dio a Run. 
-
     */
     rutinaRun();
 
