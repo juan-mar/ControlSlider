@@ -74,11 +74,13 @@ void loop() {
     else{
         //codigo de emergencia
         rutinaEmergencia();   
-            
+
     }
 
 */
-   
+    
+    
+
     //Lectura de encoder y botones
     if(millis() - timer_1 > 100){
         readEncoder();
@@ -267,8 +269,7 @@ void rutinaRun(){
     if(newTramo){   
         //Estoy en tramo current
         show_screen("Moviendo motor", BLANK);
-        stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo), 
-                                        slider.getTiempo(currentTramo));
+        stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo),slider.getTiempo(currentTramo));
     }    
     if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
 //    if(stepper.getStepsRemainig()){
