@@ -14,13 +14,13 @@
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
- //static DRV8825 stepper(MOTOR_STEPS, DIR, STEP, SLEEP, MODE0, MODE1, MODE2);
+
 
 
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
  ******************************************************************************/
-// motor_t stepper;
+
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
@@ -67,7 +67,7 @@ Motor::~Motor()
 
 }
 
-void Motor::calcTraj(int x_o, int x_f, float time)
+void Motor::calcConstTime(int x_o, int x_f, float time)
 {
     stepsRemainig = abs(x_f - x_o);
     speed = stepsRemainig/(time*1000);                     //me da en pasos por ms

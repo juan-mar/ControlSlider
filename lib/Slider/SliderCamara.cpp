@@ -41,6 +41,7 @@ static int state;
 void InitSlider()
 {
     state = STOPPED;
+    slider.numTramos = 1;
 
 }
 
@@ -57,11 +58,11 @@ void modifyMovement(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo)
 
 void modifyNumTramos(bool action)
 {
-    if(action)
+    if(action && slider.numTramos < 5)
     {
         slider.numTramos++;
     }
-    else
+    else if( action == ERASE && slider.numTramos > 1)
     {
         slider.numTramos--;
     }
