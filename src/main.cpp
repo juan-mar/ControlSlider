@@ -20,17 +20,17 @@ Button finDeLinea = Button(PIN_END_LINE, ACT_HIGH);
 Button emergencia = Button(PIN_EMERGENCIA, ACT_HIGH);
 bool paradaEmergencia = false;
 
-Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
-Slider slider;
+//Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
+//Slider slider;
 void readEncoder();
 void readButtons(void);
 void rutinaEmergencia();
-void rutinaRun();
+
 
 
 //timers
 uint64_t timer_1 = 0;
-uint64_t timer_2 = 0;
+//uint64_t timer_2 = 0;
 
 uint64_t timer_3 = 0;
 
@@ -47,6 +47,7 @@ void setup() {
 //    state = FSM_GetInitState();
     EG_addExternEvent(NONE);
     InitDisp();
+    InitSlider();
     show_screen("Hello World.....", BLANK);
     //show_curs(0, 1);
     
@@ -56,16 +57,19 @@ void setup() {
 
     setMotorEnable(ON);
     setStepRemainig(0);
+    setStepCurrent(0);
 
 
     modifyNumTramos(ADD);
     modifyNumTramos(ADD);
 
 
-    modifyMovement(1, 1000,2000,5);
-    modifyMovement(2, 2000,1000,10);
-    modifyMovement(3, 1000,3000,15);   
+    modifyMovement(1, 0, 1000, 10);
+    modifyMovement(2, 1000,3000,10);
+    modifyMovement(3, 3000,4000,15);   
     setState(RUNNING);
+    //Serial.println(getStateSlider());
+    //Serial.println(getXf(getCurrentTramo()));
 
 }
 
@@ -98,13 +102,15 @@ void loop() {
 
 
     if(millis() - timer_3 > 50){
-        disp_write_number(stepper.getStepCurr(),0,1);
-        Serial.println(stepper.getStepCurr());
+        disp_write_number(getStepCurrent(),0,1);
+        //Serial.println(getStepCurrent());
         timer_3 = millis();
     }
 
+    
 
     if(getStateSlider() == RUNNING){
+        //move2origin(&inicioDeLinea);
         runMotor();
         if(getStepCurrent() < getXf(getCurrentTramo())){
             updateMotor();

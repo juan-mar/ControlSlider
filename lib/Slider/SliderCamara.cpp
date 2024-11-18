@@ -46,6 +46,7 @@ void InitSlider()
     state = STOPPED;
     slider.numTramos = 1;
     currentTramo = 0;
+    setStepCurrent(0);
 }
 
 /*******************************************************************************
@@ -144,10 +145,11 @@ void move2origin(Button * inicioLinea)
 
 void updateMotor()
 {
-    if(micros() - timer_2 > (stepper.getTimeConst())){
+    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
         stepper.sendStep();
         timer_2 = micros();
     }
+    //Serial.println(getStepCurrent());
 }
 
 void setTimeConst(uint64_t time)
@@ -158,7 +160,6 @@ void setTimeConst(uint64_t time)
 void runMotor()
 {
     static int tramos_faltantes = slider.numTramos;
-    int currentTramo = 0;
     static int cantTramos = slider.numTramos;
     static int newTramo = 1;
     if(newTramo){   
@@ -166,15 +167,32 @@ void runMotor()
         show_screen("Moviendo motor", BLANK);
         stepper.calcConstTime(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
-    }    
+        newTramo = 0;
+    }
+
+    if(slider.getX0(currentTramo) < slider.getXf(currentTramo)){
+        stepper.setDir(ANTIHORARIO);
+    }
+    else{
+        stepper.setDir(HORARIO);
+    }
+
     if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
 //    if(stepper.getStepsRemainig()){
         newTramo = 0;
     }
     else{
         //Estoy en tramo siguiente
-        currentTramo++;
-        newTramo = 1;
+        if(currentTramo < cantTramos){
+            currentTramo++;
+            newTramo = 1;
+        }
+        else{
+            setState(STOPPED);
+            currentTramo = 0;
+            newTramo = 1;
+
+        }
     }
     
 }
@@ -215,7 +233,7 @@ uint64_t getStepRemainig()
     return stepper.getStepsRemainig();
 }
 
-void setStepCurrent(int step)
+void setStepCurrent(uint64_t step)
 {
     stepper.setStepCurrent(step);
 }

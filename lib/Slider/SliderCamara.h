@@ -68,7 +68,7 @@ void setStepRemainig(int step);
 
 uint64_t getStepRemainig();
 
-void setStepCurrent(int step);
+void setStepCurrent(uint64_t step);
 
 uint64_t getStepCurrent();
 
