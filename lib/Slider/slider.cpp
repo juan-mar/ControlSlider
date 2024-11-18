@@ -3,8 +3,6 @@
 #include "Stepper.h"
 
 
-static Slider slider;
-
 
 Slider::Slider(){
     numTramos = 1;
