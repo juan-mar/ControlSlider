@@ -227,8 +227,8 @@ state_edge_t edit_parts[] = {
 	{END_OF_LINE, edit_parts, do_nothing, show_edit_part},
 
 	//Eventos de transiscion
-	{X0, selec_x0, do_nothing, do_nothing},
-	{XF, selec_xf, do_nothing, do_nothing},
+	{X0, selec_x0, do_nothing, show_selec_x0},
+	{XF, selec_xf, do_nothing, show_selec_xf},
 	{SELEC_DELTA_T, selec_delta_t, do_nothing, do_nothing},
 	
     {NONE, estado_init, do_nothing, do_nothing}
@@ -544,6 +544,7 @@ static void show_selec_x0(void) {
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
 				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 	disp_write_number(tramos[part_to_edit].x0, X0_COL + 4, X0_FIL);
+	disp_write_number(tramos[part_to_edit].tiempo, SEL_TIME_COL + 3, SEL_TIME_FIL);
 }	
 
 static void select_x0(void) {
@@ -597,6 +598,7 @@ static void show_selec_xf(void) {
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
 				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 	disp_write_number(tramos[part_to_edit].xf, XF_COL + 4, XF_FIL);
+	disp_write_number(tramos[part_to_edit].tiempo, SEL_TIME_COL + 3, SEL_TIME_FIL);
 }
 
 static void select_xf(void) {
