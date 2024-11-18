@@ -16,12 +16,6 @@ enum cursor_fil{FILA0 = 0, FILA1};
 
 #define SEL_DIS_COL     0
 #define SEL_DIS_FIL     0
-#define SEL_DELTA_COL   1
-#define SEL_DELTA_FIL   1
-#define X0_COL          0
-#define X0_FIL          0
-#define XF_COL          1
-#define XF_FIL          1
 #define LEFT_COL        2
 #define LEFT_FIL        2
 #define RIGHT_COL       3
@@ -59,7 +53,7 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define BACK_FIL        0
 
 
-// PARTS
+// SELECT PARTS
 #define PARTS            " Edit Part:    B"
 #define ADD_DEL          " Add         Del"
 #define EDIT_PARTS_COL  0
@@ -73,9 +67,17 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define NUN_PARTS_COL   12
 
 
-// PART SETTINGS
-#define POSITIONS        " Xo:    Xf:    B"
-#define TIME_VEL         " T:   s V:   m/s"
+// EDIT PART
+#define TIME_BACK        " T:    s       B"
+#define POSITIONS        " Xo:     Xf:    "
+#define X0_COL          0
+#define X0_FIL          1
+#define XF_COL          8
+#define XF_FIL          1
+#define SEL_TIME_COL    0
+#define SEL_TIME_FIL    0
+
+
 
 
 #define OFFSET_XF        7

@@ -75,9 +75,11 @@ void loop() {
     else{
         //codigo de emergencia
         rutinaEmergencia();   
-            
+
     }
-   
+    
+    
+
     //Lectura de encoder y botones
     if(millis() - timer_1 > 100){
         readEncoder();

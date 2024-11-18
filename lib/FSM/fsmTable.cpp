@@ -5,7 +5,9 @@
 #include "Display.h"
 #include "screen.h"
 #include "EventGenerator.h"
-#include "slider.h"
+#include "sliderCamara.h"
+
+
 
 /*******************************************************************************
  * Foward declarations States
@@ -22,7 +24,8 @@ extern state_edge_t set_part_to_edit[];
 
 extern state_edge_t edit_parts[];
 
-extern state_edge_t selec_distances[];
+extern state_edge_t selec_x0[];
+extern state_edge_t selec_xf[];
 extern state_edge_t selec_delta_t[];
 extern state_edge_t selec_vel[];
 
@@ -57,6 +60,10 @@ enum eventos{
 //Items definitions
 #define MAX_ITEMS 10
 
+//Constant steps 
+#define STEP 		100
+#define TIME_STEP_S	5
+#define VACIO		(-1)
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -74,6 +81,11 @@ typedef struct{
 	uint8_t item_cant;
 }menu_items_t;
 
+typedef struct{
+	int64_t x0;
+	int64_t xf;
+	int64_t tiempo;
+}tramo_t;
 
 
 /*******************************************************************************
@@ -107,6 +119,19 @@ static void prevPart(void);
 static void selectPart(void);
 static void add_part(void);
 static void delete_part(void);
+
+//rutinas de select x0 y xf
+static void show_selec_x0(void);
+static void show_selec_xf(void);
+static void select_x0(void);
+static void increment_x0(void);	
+static void decrement_x0(void);
+static void select_xf(void);
+static void increment_xf(void);
+static void decrement_xf(void);
+static void stop_limit_x0(void);
+static void stop_limit_xf(void);
+
 
 static void run_slider(void);
 
@@ -202,32 +227,39 @@ state_edge_t edit_parts[] = {
 	{END_OF_LINE, edit_parts, do_nothing, show_edit_part},
 
 	//Eventos de transiscion
-	{SELEC_DIS, selec_distances, do_nothing, do_nothing},
+	{X0, selec_x0, do_nothing, do_nothing},
+	{XF, selec_xf, do_nothing, do_nothing},
 	{SELEC_DELTA_T, selec_delta_t, do_nothing, do_nothing},
-	{SELEC_VEL, selec_vel, do_nothing, do_nothing},
 	
-
     {NONE, estado_init, do_nothing, do_nothing}
 };
 
 
 
-state_edge_t selec_distances[] = {
+state_edge_t selec_x0[] = {
 	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_distances, nextItem, show_part_to_edit},
-	{ENCODER_LEFT, selec_distances, prevItem, show_part_to_edit},
-	{ENCODER_SWITCH, selec_distances, selectItem, show_part_to_edit},
+	{ENCODER_RIGHT, selec_x0, increment_x0, show_selec_x0},
+	{ENCODER_LEFT, selec_x0, decrement_x0, show_selec_x0},
+	{ENCODER_SWITCH, edit_parts, select_x0, show_part_to_edit},
 
-	{INIT_OF_LINE, selec_distances, do_nothing, show_part_to_edit},
-	{END_OF_LINE, selec_distances, do_nothing, show_part_to_edit},
+	{INIT_OF_LINE, selec_x0, stop_limit_x0, show_selec_x0},
+	{END_OF_LINE, selec_x0, stop_limit_x0, show_selec_x0},
 
 	//Eventos de transiscion
-	{X0, selec_distances, do_nothing, do_nothing},
-	{XF, selec_distances, do_nothing, do_nothing},
-	{RIGH, selec_distances, do_nothing, do_nothing},	
-	{LEFT, selec_distances, do_nothing, do_nothing},
-	{OK_, edit_parts, do_nothing, do_nothing},
+	
+	{NONE, selec_x0, do_nothing, do_nothing}
+};
 
+state_edge_t selec_xf[] = {
+	//eventos de EventGenerator
+	{ENCODER_RIGHT, selec_xf, increment_xf, show_selec_xf},
+	{ENCODER_LEFT, selec_xf, decrement_xf, show_selec_xf},
+	{ENCODER_SWITCH, edit_parts, select_xf, show_part_to_edit},
+
+	{INIT_OF_LINE, selec_xf, stop_limit_xf, show_selec_xf},
+	{END_OF_LINE, selec_xf, stop_limit_xf, show_selec_xf},
+
+	//Eventos de transiscion
 	{NONE, estado_init, do_nothing, do_nothing}
 };
 
@@ -307,9 +339,9 @@ static menu_items_t run_items = {{{0, PAUSE_, PAUSE_COL, PAUSE_FIL},
 								  0, 3};
 
 static menu_items_t setting_items = {{{0, MANUAL, MANUAL_COL, MANUAL_FIL},
-										  {1, BLUETOOTH, BLUETOOTH_COL, BLUETOOTH_FIL},
-										  {2, BACK, BACK_COL, BACK_FIL}},
-										  0, 3};
+									  {1, BLUETOOTH, BLUETOOTH_COL, BLUETOOTH_FIL},
+									  {2, BACK, BACK_COL, BACK_FIL}},
+									   0, 3};
 
 static menu_items_t set_manually_items = {{{0, EDIT_PARTS,EDIT_PARTS_COL, EDIT_PARTS_FIL},
 										  {1, ADD_PART, ADD_PART_COL, ADD_PART_FIL},
@@ -317,17 +349,11 @@ static menu_items_t set_manually_items = {{{0, EDIT_PARTS,EDIT_PARTS_COL, EDIT_P
 										  {3, BACK, BACK_COL, BACK_FIL}}, 
 										  0, 4};
 
-static menu_items_t edit_parts_items = {{{0, SELEC_DIS, SEL_DIS_COL, SEL_DIS_FIL},
-										 {1, SELEC_DELTA_T, SEL_DELTA_COL, SEL_DELTA_FIL},
-										 {2, BACK, BACK_COL, BACK_FIL}}, 
-										  0, 3};
-
-static menu_items_t selec_dis_items = {{{0, X0, X0_COL, X0_FIL},
-										{1, XF, XF_COL, XF_FIL},
-										{2, LEFT, LEFT_COL, LEFT_FIL},
-										{3, RIGH, RIGHT_COL, RIGHT_FIL},
-										{4, OK_, OK_COL, OK_FIL}},
-										0, 5};
+static menu_items_t edit_parts_items = {{{0, X0, X0_COL, X0_FIL},
+										 {1, XF, XF_COL, XF_FIL},
+										 {2, SELEC_DELTA_T, SEL_TIME_COL, SEL_TIME_FIL},
+										 {3, BACK, BACK_COL, BACK_FIL}}, 
+										  0, 4};
 
 static menu_items_t selec_numbers = {{{0, DIGIT_0, DIGIT_0_COL, DIGIT_0_FIL},
 									{1, DIGIT_1, DIGIT_1_COL, DIGIT_1_FIL},
@@ -337,9 +363,12 @@ static menu_items_t selec_numbers = {{{0, DIGIT_0, DIGIT_0_COL, DIGIT_0_FIL},
 									0, 5};
 
 static uint8_t part_to_edit = 0;
+static tramo_t tramos[5] = {{0,100,10},
+							{VACIO,VACIO,VACIO},
+							{VACIO,VACIO,VACIO},
+							{VACIO,VACIO,VACIO},
+							{VACIO,VACIO,VACIO}};
 
-//Objet Slider
-static Slider slider;
 
 /*******************************************************************************
  *******************************************************************************
@@ -452,33 +481,39 @@ static void show_set_manually(void) {
 }
 
 static void add_part(void) {
-	slider.agregarTramo( slider.getX0(slider.numTramos-1),slider.getX0(slider.numTramos-1)+1);
+	if(getCantTramos() < 5){
+		modifyNumTramos(ADD);
+		tramos[getCantTramos()-1].x0 = tramos[getCantTramos()-2].xf;
+		tramos[getCantTramos()-1].xf = tramos[getCantTramos()-1].x0 + 100;	
+		tramos[getCantTramos()-1].tiempo = 10;
+		modifyMovement(getCantTramos()-1, VACIO, VACIO, VACIO);	
+	}
 }
 
 static void delete_part(void) {
-	slider.borrarUltimoTramo();
+	modifyNumTramos(ERASE);
 }
 
 /*******************************************************************************
  * 						select part to edit FUNCTIONS
  ******************************************************************************/
 static void show_part_to_edit(void) {
-	show_screen(PARTS, ADD_DEL);
+	//show_screen(PARTS, ADD_DEL);
 	show_curs(SEL_PART_COL, SEL_PART_FIL);
-	//disp_write('0'+part_to_edit, NUN_PARTS_COL, SEL_PART_FIL);
+	disp_write_number(part_to_edit+1, NUN_PARTS_COL, SEL_PART_FIL);
 
 }
 
 static void nextPart(void) {
 	part_to_edit++;
-	if(part_to_edit >= slider.numTramos){
+	if(part_to_edit >= getCantTramos()){
 		part_to_edit = 0;
 	}
 }
 
 static void prevPart(void) {
 	if(part_to_edit == 0){
-		part_to_edit = slider.numTramos - 1;
+		part_to_edit = getCantTramos() - 1;
 	}
 	else{
 		part_to_edit--;
@@ -493,23 +528,128 @@ static void prevPart(void) {
  ******************************************************************************/
 static void show_edit_part(void) {
 	currentStateItem = &edit_parts_items;
-	show_screen(POSITIONS, TIME_VEL);
+	show_screen(TIME_BACK, POSITIONS);
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
 				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+	//Upload valores del tramo a editar
 
 }
 
 /*******************************************************************************
- * 						selec distances FUNCTIONS
+ * 						selec X0 y Xf FUNCTIONS
  ******************************************************************************/
-//TODO: Implementar las funciones de seleccion de distancias
-static void show_select_dis(void) {
-	currentStateItem = &selec_dis_items;
-	show_screen(BLANK, BLANK);
+//------------------------------------X0-----------------------------------------
+static void show_selec_x0(void) {
+	show_screen(TIME_BACK, POSITIONS);
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
 				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+	disp_write_number(tramos[part_to_edit].x0, X0_COL + 4, X0_FIL);
 }	
 
+static void select_x0(void) {
+	if(part_to_edit > 0){
+		tramos[part_to_edit-1].xf = tramos[part_to_edit].x0;
+		if(tramos[part_to_edit].x0 > tramos[part_to_edit-1].xf){
+			//Se agranda el tramo anterior por ser X0_actual > Xf_prev
+			//verifico que tiempo en el tramo sea el correcto
+			uint64_t delta_time_steps = (1000*1000*(tramos[part_to_edit-1].xf - tramos[part_to_edit-1].x0))/tramos[part_to_edit-1].tiempo;
+			if(delta_time_steps < MAX_VEL){
+				delta_time_steps = MAX_VEL;
+				tramos[part_to_edit-1].tiempo = (1000*1000*(tramos[part_to_edit-1].xf - tramos[part_to_edit-1].x0))/MAX_VEL;			
+			}		
+		}
+		modifyMovement(part_to_edit, tramos[part_to_edit-1].x0, tramos[part_to_edit-1].xf, tramos[part_to_edit-1].tiempo);
+	}
+	else{
+		modifyMovement(part_to_edit, tramos[part_to_edit].x0, tramos[part_to_edit].xf, tramos[part_to_edit].tiempo);
+	}
+}
+
+static void increment_x0(void) {	
+	setMotorDir(ANTIHORARIO);	//antihorario
+	tramos[part_to_edit].x0 += STEP;
+	setMoreSteps(STEP);
+}
+
+static void decrement_x0(void) {	
+	setMotorDir(HORARIO);	//horario
+	if(tramos[part_to_edit].x0 > STEP){
+		tramos[part_to_edit].x0 -= STEP;
+		setMoreSteps(STEP);
+	}
+	else{
+		setStepRemainig(tramos[part_to_edit].x0);
+		tramos[part_to_edit].x0 = 0;
+	}
+}
+
+static void stop_limit_x0(void) {
+	uint64_t steps = getStepRemainig();
+	setStepRemainig(0);
+	tramos[part_to_edit].x0 -= steps;
+	//otra opcion
+	//tramos[part_to_edit].x0 = getCurrentStep();
+}
+
+//------------------------------------Xf-----------------------------------------
+static void show_selec_xf(void) {
+	show_screen(TIME_BACK, POSITIONS);
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+	disp_write_number(tramos[part_to_edit].xf, XF_COL + 4, XF_FIL);
+}
+
+static void select_xf(void) {
+	if(part_to_edit > 0 && part_to_edit < getCantTramos()-1){
+		//no es el ultimo tramo
+		tramos[part_to_edit+1].x0 = tramos[part_to_edit].xf;
+		if(tramos[part_to_edit].xf < tramos[part_to_edit+1].x0){
+			//Se agranda el tramo siguiente por ser Xf_actual < X0_next
+			//verifico que tiempo en el tramo sea el correcto
+			uint64_t delta_time_steps = (1000*1000*(tramos[part_to_edit+1].xf - tramos[part_to_edit+1].x0))/tramos[part_to_edit+1].tiempo;
+			if(delta_time_steps < MAX_VEL){
+				delta_time_steps = MAX_VEL;
+				tramos[part_to_edit+1].tiempo = (1000*1000*(tramos[part_to_edit+1].xf - tramos[part_to_edit+1].x0))/MAX_VEL;			
+			}
+		}
+		modifyMovement(part_to_edit, tramos[part_to_edit+1].x0, tramos[part_to_edit+1].xf, tramos[part_to_edit+1].tiempo);
+	}
+	//es el ultimo tramo
+	//verifico que tiempo en el tramo sea el correcto
+	uint64_t delta_time_steps = (1000*1000*(tramos[part_to_edit].xf - tramos[part_to_edit].x0))/tramos[part_to_edit].tiempo;
+	if(delta_time_steps < MAX_VEL){
+		delta_time_steps = MAX_VEL;
+		tramos[part_to_edit].tiempo = (1000*1000*(tramos[part_to_edit].xf - tramos[part_to_edit].x0))/MAX_VEL;			
+	}
+	modifyMovement(part_to_edit, tramos[part_to_edit].x0, tramos[part_to_edit].xf, tramos[part_to_edit].tiempo);
+}
+
+static void increment_xf(void) {
+	tramos[part_to_edit].xf += STEP;
+	setMoreSteps(STEP);
+	setMotorDir(ANTIHORARIO);	
+}
+
+static void decrement_xf(void){
+	if(tramos[part_to_edit].xf - STEP > tramos[part_to_edit].x0){
+		tramos[part_to_edit].xf -= STEP;
+		setMoreSteps(STEP);
+	}
+	else{
+		//Si quiero decrementar menos de lo que ya tengo en x0 no puedo (do_nothing)
+		//setStepRemainig(tramos[part_to_edit].xf);
+		//tramos[part_to_edit].xf = tramos[part_to_edit].x0;
+	}
+	setMotorDir(HORARIO);	
+}
+
+static void stop_limit_xf(void) {
+	uint64_t steps = getStepRemainig();
+	setStepRemainig(0);
+	tramos[part_to_edit].xf -= steps;
+	//otra opcion
+	//tramos[part_to_edit].xf = getCurrentStep();
+}
 
 /*******************************************************************************
  * 						selec delta T FUNCTIONS
