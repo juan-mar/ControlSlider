@@ -55,21 +55,17 @@ void setup() {
     encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
 	encoder.setCount(0);
 
-    setMotorEnable(ON);
-    setStepRemainig(0);
-    setStepCurrent(0);
-
-
     modifyNumTramos(ADD);
     modifyNumTramos(ADD);
-
 
     modifyMovement(1, 0, 1000, 10);
-    modifyMovement(2, 1000,3000,10);
-    modifyMovement(3, 3000,4000,15);   
+    modifyMovement(2, 1000, 3000,10);
+    modifyMovement(3, 3000, 5000,15);   
     setState(RUNNING);
     //Serial.println(getStateSlider());
     //Serial.println(getXf(getCurrentTramo()));
+
+    setMotorEnable(ON);
 
 }
 
@@ -110,7 +106,7 @@ void loop() {
     
 
     if(getStateSlider() == RUNNING){
-        //move2origin(&inicioDeLinea);
+        move2origin(&inicioDeLinea);
         runMotor();
         if(getStepCurrent() < getXf(getCurrentTramo())){
             updateMotor();
