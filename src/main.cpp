@@ -10,6 +10,7 @@
 #include "ESP32Encoder.h"
 #include "Stepper.h"
 #include "slider.h"
+#include "SliderCamara.h"
 
 //sensores 
 ESP32Encoder encoder;
@@ -61,7 +62,7 @@ void setup() {
 }
 
 void loop() {
-/*
+
     //si no hay emergencia
     if(paradaEmergencia == false){ 
         if(!EG_isEmpty()){
@@ -76,8 +77,6 @@ void loop() {
         rutinaEmergencia();   
             
     }
-
-*/
    
     //Lectura de encoder y botones
     if(millis() - timer_1 > 100){
@@ -93,16 +92,18 @@ void loop() {
         timer_3 = millis();
     }
 
-    
-    //Mover motor
-    rutinaRun();
-
-    if(stepper.getStepsRemainig()){
-        if(micros() - timer_2 > (1000/2)){
-            stepper.sendStep();
-            timer_2 = micros();
-        }
+    if(getStateSlider() == RUNNING){
+        updateMotor();
     }
+
+
+    
+    //if(stepper.getStepsRemainig()){
+    //    if(micros() - timer_2 > (1000/2)){
+    //        stepper.sendStep();
+    //        timer_2 = micros();
+    //    }
+    //}
     //updateMotorSlider();
     
 }
@@ -212,81 +213,3 @@ void rutinaEmergencia(){
     }
 }
 
-
-
-void rutinaRun(){
-    static int tramos_faltantes = slider.numTramos;
-    static int go_origin = 1;
-    static int go_X0 = 0;
-    static int currentTramo = 0;
-    static int cantTramos = slider.numTramos;
-    static int newTramo = 1;
-
-    if(go_origin){
-        show_screen("Yendo a inicio", "Moviendo motor");
-        stepper.setDir(HORARIO);
-        stepper.setEnableMotor(ON);
-        if(inicioDeLinea.getState() == NOT_PRESSED){
-            if(micros() - timer_2 > (1000/2)){
-                stepper.sendStep();
-                timer_2 = micros();
-            }
-        }
-        else{
-            delay(500);
-            go_origin = 0;
-            go_X0 = 1;
-            stepper.setStepCurrent(0);
-        }
-
-    }
-    
-        //stepper.setEnableMotor(ON);
-    if(go_X0){
-        stepper.setDir(ANTIHORARIO);
-        uint64_t x0_ = slider.getX0(0);
-        show_screen("Yendo a x0", "Moviendo motor");
-
-        //Go to Initial Position
-        if(stepper.getStepCurr() < x0_){
-            if(micros() - timer_2 > (1000/2)){
-                stepper.sendStep();
-                timer_2 = micros();
-            }
-        }
-        else{
-            delay(500);
-            go_X0 = 0;
-            go_origin = 0;
-        }
-        
-    }
-    
-    //stepper.setDir(ANTIHORARIO);
-
-    if(newTramo){   
-        //Estoy en tramo current
-        show_screen("Moviendo motor", BLANK);
-        //stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo), slider.getTiempo(currentTramo));
-    }    
-    if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
-//    if(stepper.getStepsRemainig()){
-        newTramo = 0;
-    }
-    else{
-        //Estoy en tramo siguiente
-        currentTramo++;
-        newTramo = 1;
-    }
-    
-    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
-        if(stepper.getStepCurr() < slider.getXf(currentTramo)){
-            stepper.sendStep();
-        }
-        else{
-            stepper.setEnableMotor(OFF);
-        }
-        timer_2 = micros();
-    }                         
-
-}
