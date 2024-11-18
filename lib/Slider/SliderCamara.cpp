@@ -14,8 +14,6 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 #include "SliderCamara.h"
-#include "slider.h"
-#include "Stepper.h"
 #include "board.h"
 #include "Display.h"
 
@@ -24,7 +22,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 static Slider slider;
-static Motor stepper;
+static Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
 
 
 /*******************************************************************************
@@ -34,16 +32,40 @@ static Motor stepper;
 /*******************************************************************************
  * VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
-uint64_t timer_2 = 0;
+static uint64_t timer_2 = 0;
+static int state;
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS
  ******************************************************************************/
+void InitSlider()
+{
+    state = STOPPED;
+
+}
+
+
 void storeMovement(uint64_t x0, uint64_t xf, uint64_t tiempo)
 {
     slider.agregarTramo(x0, xf, tiempo);
 }
 
+void modifyMovement(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo)
+{
+    slider.modificarTramo(tramo, x0, xf, tiempo);
+}
+
+void modifyNumTramos(bool action)
+{
+    if(action)
+    {
+        slider.numTramos++;
+    }
+    else
+    {
+        slider.numTramos--;
+    }
+}
 
 
 void move2origin(Button * inicioLinea)
@@ -99,7 +121,7 @@ void setTimeConst(uint64_t time)
     stepper.setTimeConst(time);
 }
 
-void runMotor()
+void setMotor()
 {
     static int tramos_faltantes = slider.numTramos;
     static int currentTramo = 0;
@@ -108,7 +130,7 @@ void runMotor()
     if(newTramo){   
         //Estoy en tramo current
         show_screen("Moviendo motor", BLANK);
-        stepper.calcTraj(slider.getX0(currentTramo), slider.getXf(currentTramo), 
+        stepper.calcConstTime(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
     }    
     if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
@@ -121,15 +143,6 @@ void runMotor()
         newTramo = 1;
     }
     
-    if(micros() - timer_2 > (stepper.getTimeConst()/2)){
-        if(stepper.getStepCurr() < slider.getXf(currentTramo)){
-            stepper.sendStep();
-        }
-        else{
-            stepper.setEnableMotor(OFF);
-        }
-        timer_2 = micros();
-    }
 }
 
 
@@ -176,4 +189,19 @@ void setStepCurrent(int step)
 uint64_t getStepCurrent()
 {
     return stepper.getStepCurr();
+}
+
+int getCantTramos()
+{
+    return slider.numTramos;
+}
+
+void setState(int estado)
+{
+    state = estado;
+}
+
+int getStateSlider()
+{
+    return state;
 }

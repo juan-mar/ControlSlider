@@ -5,31 +5,55 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include "Button.h"
+#include "Stepper.h"
+#include "slider.h"
 
 /*******************************************************************************
  * DEFINICION DE CONSTANTES
  ******************************************************************************/
+#define STOPPED 0
+#define RUNNING 1
+#define PAUSED  2
 
+#define ADD     1
+#define ERASE   0
 
 
 /*******************************************************************************
  * DEFINICION DE FUNCIONES
  ******************************************************************************/
-void storeMovement(uint64_t x0, uint64_t xf, uint64_t tiempo);
+//Init
+void InitSlider();
 
-void move2origin(Button * inicioLinea);
 
-void updateMotor();
+//Funciones para Slider
+void storeMovement(uint64_t x0, uint64_t xf, uint64_t tiempo);              //Guarda un movimiento en el slider
 
-void setTimeConst(uint64_t time);
+void modifyMovement(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo);  //Modifica un movimiento en el slider
 
-void runMotor();
+void modifyNumTramos(bool action);                                          //Modifica la cantidad de tramos
+
+int getCantTramos();                                                        //Devuelve la cantidad de tramos
+
+void setState(int estado);                                                  //Setea el flag de inicio de movimiento
+
+int getStateSlider();                                                       //Indica el estado actual del slider
+
+
+//Funciones para Motor
+void move2origin(Button * inicioLinea);                                     //Mueve el motor a x0
+
+void updateMotor();                                                         //se llama desde el main para mover al motor
+
+void setTimeConst(uint64_t time);                                           //Setea la constante de tiempo
+
+void setMotor();                                                            //Mueve el motor
 
 void setMotorDir(int dir);
 
 void setMotorEnable(int enable);
 
-void setMotorSteps(int step);
+void setMoreSteps(int step);
 
 void getCurrStep();
 
@@ -42,10 +66,6 @@ uint64_t getStepRemainig();
 void setStepCurrent(int step);
 
 uint64_t getStepCurrent();
-
-
-
-
 
 
 #endif /* SLIDERCAMARA_H_ */
