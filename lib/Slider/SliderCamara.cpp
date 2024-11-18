@@ -153,7 +153,27 @@ void getCurrStep()
     stepper.getStepCurr();
 }
 
-void getEnableMotor()
+bool getEnableMotor()
 {
-    stepper.getEnableMotor();
+    return stepper.getEnableMotor();
+}
+
+void setStepRemainig(int step)
+{
+    stepper.setSteps(step);
+}
+
+uint64_t getStepRemainig()
+{
+    return stepper.getStepsRemainig();
+}
+
+void setStepCurrent(int step)
+{
+    stepper.setStepCurrent(step);
+}
+
+uint64_t getStepCurrent()
+{
+    return stepper.getStepCurr();
 }

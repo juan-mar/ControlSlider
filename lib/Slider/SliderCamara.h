@@ -33,7 +33,15 @@ void setMotorSteps(int step);
 
 void getCurrStep();
 
-void getEnableMotor();
+bool getEnableMotor();
+
+void setStepRemainig(int step);
+
+uint64_t getStepRemainig();
+
+void setStepCurrent(int step);
+
+uint64_t getStepCurrent();
 
 
 
