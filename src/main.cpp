@@ -110,8 +110,6 @@ void loop() {
             updateMotor();
         }
     }
-
-    
 }
 
 

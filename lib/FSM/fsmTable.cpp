@@ -20,14 +20,13 @@ extern state_edge_t run[];
 
 extern state_edge_t bluetooth[];
 extern state_edge_t set_manually[];
-extern state_edge_t set_part_to_edit[];
+extern state_edge_t set_parts[];
 
-extern state_edge_t edit_parts[];
+extern state_edge_t edit_distances[];
+extern state_edge_t edit_times[];	
 
-extern state_edge_t selec_x0[];
-extern state_edge_t selec_xf[];
+extern state_edge_t selec_x[];
 extern state_edge_t selec_delta_t[];
-extern state_edge_t selec_vel[];
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -39,11 +38,11 @@ enum eventos{
 	SETTING,
 	BLUETOOTH,
 	MANUAL,
-	EDIT_PARTS,
+	SET_PARTS,
 	ADD_PART,
 	DELETE_PART,
-	SELEC_DIS,
-	SELEC_DELTA_T,
+	SET_DIS,
+	SET_TIMES,
 	SELEC_VEL,
 	X0,
 	XF,
@@ -98,9 +97,9 @@ static void show_run(void);
 static void show_settings(void);
 static void show_bluetooth(void);
 static void show_set_manually(void);
-static void show_part_to_edit(void);
-static void show_edit_part(void);
-static void show_select_dis(void);
+static void show_set_parts(void);
+static void show_edit_dis(void);
+static void show_edit_time(void);
 static void show_select_delta_t(void);
 
 
@@ -114,23 +113,16 @@ static void selectItem(void);
 static void activeBluetooth(void);
 
 //set manually and Selec part to edit
-static void nextPart(void);
-static void prevPart(void);
 static void selectPart(void);
 static void add_part(void);
 static void delete_part(void);
 
 //rutinas de select x0 y xf
-static void show_selec_x0(void);
-static void show_selec_xf(void);
-static void select_x0(void);
-static void increment_x0(void);	
-static void decrement_x0(void);
-static void select_xf(void);
-static void increment_xf(void);
-static void decrement_xf(void);
-static void stop_limit_x0(void);
-static void stop_limit_xf(void);
+static void show_selec_x(void);
+static void select_x(void);
+static void increment_x(void);	
+static void decrement_x(void);
+static void stop_limit_x(void);
 
 
 static void run_slider(void);
@@ -198,26 +190,60 @@ state_edge_t set_manually[] = {
 	{END_OF_LINE, set_manually, do_nothing, show_set_manually},
 
 	//Eventos de transiscion
-	{EDIT_PARTS, set_part_to_edit, do_nothing, show_part_to_edit},
+	{SET_PARTS, set_parts, do_nothing, show_set_parts},
 	{ADD_PART, set_manually, do_nothing, show_set_manually},
 	{DELETE_PART, set_manually, do_nothing, show_set_manually},
 	{BACK, settings, show_settings, show_settings},
 	{NONE, set_manually, do_nothing, show_set_manually}
 };
 
-state_edge_t set_part_to_edit[] = {
+state_edge_t set_parts[] = {
 	//Eventos de EventGenerator
-	{ENCODER_RIGHT, set_part_to_edit, nextPart, show_part_to_edit},
-	{ENCODER_LEFT, set_part_to_edit, prevPart, show_part_to_edit},	
-	{ENCODER_SWITCH, edit_parts, show_edit_part, show_edit_part},
+	{ENCODER_RIGHT, set_parts, nextItem, show_set_parts},
+	{ENCODER_LEFT, set_parts, prevItem, show_set_parts},	
+	{ENCODER_SWITCH, set_parts, selectItem, show_set_parts},
 
-	{INIT_OF_LINE, set_part_to_edit, do_nothing, do_nothing},
-	{END_OF_LINE, set_part_to_edit, do_nothing, do_nothing},
+	{INIT_OF_LINE, set_parts, do_nothing, do_nothing},
+	{END_OF_LINE, set_parts, do_nothing, do_nothing},
 
-	{NONE, set_part_to_edit, do_nothing, show_part_to_edit}
+	//Eventos de transiscion
+	{SET_TIMES, edit_times, do_nothing, show_edit_time},
+	{SET_DIS, edit_distances, do_nothing, show_edit_dis},
+	{BACK, set_manually, show_set_manually, show_set_manually},
+
+	{NONE, set_parts, do_nothing, show_set_parts}
 };
 
-state_edge_t edit_parts[] = {
+state_edge_t edit_distances[] = {
+    //Eventos de EventGenerator
+	{ENCODER_RIGHT, edit_distances, nextItem, show_edit_dis},
+	{ENCODER_LEFT, edit_distances, prevItem, show_edit_dis},
+	{ENCODER_SWITCH, selec_x, selectItem, show_edit_dis},
+
+	{INIT_OF_LINE, edit_distances, do_nothing, show_edit_dis},
+	{END_OF_LINE, edit_distances, do_nothing, show_edit_dis},
+
+	//Eventos de transiscion
+	{BACK, set_parts, do_nothing, show_set_parts},
+	
+    {NONE, estado_init, do_nothing, do_nothing}
+};
+
+state_edge_t selec_x[] = {
+	//eventos de EventGenerator
+	{ENCODER_RIGHT, selec_x, increment_x, show_selec_x},
+	{ENCODER_LEFT, selec_x, decrement_x, show_selec_x},
+	{ENCODER_SWITCH, edit_distances, select_x, show_edit_dis},
+
+	{INIT_OF_LINE, selec_x, stop_limit_x0, show_selec_x},
+	{END_OF_LINE, selec_x, stop_limit_x0, show_selec_x},
+
+	//Eventos de transiscion
+	
+	{NONE, selec_x, do_nothing, do_nothing}
+};
+
+state_edge_t edit_times[] = {
     //Eventos de EventGenerator
 	{ENCODER_RIGHT, edit_parts, nextItem, show_edit_part},
 	{ENCODER_LEFT, edit_parts, prevItem, show_edit_part},
@@ -227,41 +253,10 @@ state_edge_t edit_parts[] = {
 	{END_OF_LINE, edit_parts, do_nothing, show_edit_part},
 
 	//Eventos de transiscion
-	{X0, selec_x0, do_nothing, show_selec_x0},
-	{XF, selec_xf, do_nothing, show_selec_xf},
-	{SELEC_DELTA_T, selec_delta_t, do_nothing, do_nothing},
 	
     {NONE, estado_init, do_nothing, do_nothing}
 };
 
-
-
-state_edge_t selec_x0[] = {
-	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_x0, increment_x0, show_selec_x0},
-	{ENCODER_LEFT, selec_x0, decrement_x0, show_selec_x0},
-	{ENCODER_SWITCH, edit_parts, select_x0, show_part_to_edit},
-
-	{INIT_OF_LINE, selec_x0, stop_limit_x0, show_selec_x0},
-	{END_OF_LINE, selec_x0, stop_limit_x0, show_selec_x0},
-
-	//Eventos de transiscion
-	
-	{NONE, selec_x0, do_nothing, do_nothing}
-};
-
-state_edge_t selec_xf[] = {
-	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_xf, increment_xf, show_selec_xf},
-	{ENCODER_LEFT, selec_xf, decrement_xf, show_selec_xf},
-	{ENCODER_SWITCH, edit_parts, select_xf, show_part_to_edit},
-
-	{INIT_OF_LINE, selec_xf, stop_limit_xf, show_selec_xf},
-	{END_OF_LINE, selec_xf, stop_limit_xf, show_selec_xf},
-
-	//Eventos de transiscion
-	{NONE, estado_init, do_nothing, do_nothing}
-};
 
 state_edge_t selec_delta_t[] = {
 	//eventos de EventGenerator
@@ -282,25 +277,7 @@ state_edge_t selec_delta_t[] = {
 	{NONE, estado_init, do_nothing, do_nothing}
 };
 
-state_edge_t selec_vel[] = {
 
-	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_vel, nextItem, show_part_to_edit},
-	{ENCODER_LEFT, selec_vel, prevItem, show_part_to_edit},
-	{ENCODER_SWITCH, selec_vel, selectItem, show_part_to_edit},
-
-	{INIT_OF_LINE, selec_vel, do_nothing, show_part_to_edit},
-	{END_OF_LINE, selec_vel, do_nothing, show_part_to_edit},
-
-	//Eventos de transiscion
-	{DIGIT_0, selec_vel, do_nothing, do_nothing},
-	{DIGIT_1, selec_vel, do_nothing, do_nothing},
-	{DIGIT_2, selec_vel, do_nothing, do_nothing},
-	{DIGIT_3, selec_vel, do_nothing, do_nothing},
-	{OK_, edit_parts, do_nothing, do_nothing},
-
-	{NONE, estado_init, do_nothing, do_nothing}
-};
 
 
 //TODO: Implementar los estados de run
@@ -343,17 +320,18 @@ static menu_items_t setting_items = {{{0, MANUAL, MANUAL_COL, MANUAL_FIL},
 									  {2, BACK, BACK_COL, BACK_FIL}},
 									   0, 3};
 
-static menu_items_t set_manually_items = {{{0, EDIT_PARTS,EDIT_PARTS_COL, EDIT_PARTS_FIL},
+static menu_items_t set_manually_items = {{{0, SET_PARTS, EDIT_PARTS_COL, EDIT_PARTS_FIL},
 										  {1, ADD_PART, ADD_PART_COL, ADD_PART_FIL},
 										  {2, DELETE_PART, DEL_COL, DEL_FIL},
 										  {3, BACK, BACK_COL, BACK_FIL}}, 
-										  0, 4};
+										   0, 4};
 
-static menu_items_t edit_parts_items = {{{0, X0, X0_COL, X0_FIL},
-										 {1, XF, XF_COL, XF_FIL},
-										 {2, SELEC_DELTA_T, SEL_TIME_COL, SEL_TIME_FIL},
-										 {3, BACK, BACK_COL, BACK_FIL}}, 
-										  0, 4};
+static menu_items_t set_parts_items = {{{0, SET_TIMES, TIME_BK_COL, TIME_BK_FIL},
+										{1, SET_DIS, DISTANCES_COL, DISTANCES_FIL},
+										{2, BACK, BACK_COL, BACK_FIL}}, 
+										 0, 3};
+
+
 
 static menu_items_t selec_numbers = {{{0, DIGIT_0, DIGIT_0_COL, DIGIT_0_FIL},
 									{1, DIGIT_1, DIGIT_1_COL, DIGIT_1_FIL},
@@ -368,6 +346,8 @@ static tramo_t tramos[5] = {{0,100,10},
 							{VACIO,VACIO,VACIO},
 							{VACIO,VACIO,VACIO},
 							{VACIO,VACIO,VACIO}};
+
+							
 
 
 /*******************************************************************************
@@ -495,38 +475,22 @@ static void delete_part(void) {
 }
 
 /*******************************************************************************
- * 						select part to edit FUNCTIONS
+ * 						set parts FUNCTIONS
  ******************************************************************************/
-static void show_part_to_edit(void) {
-	//show_screen(PARTS, ADD_DEL);
-	show_curs(SEL_PART_COL, SEL_PART_FIL);
-	disp_write_number(part_to_edit+1, NUN_PARTS_COL, SEL_PART_FIL);
-
+static void show_set_parts(void) {
+	currentStateItem = &set_parts_items;
+	show_screen(TIME_BACK, POSITIONS);
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 }
-
-static void nextPart(void) {
-	part_to_edit++;
-	if(part_to_edit >= getCantTramos()){
-		part_to_edit = 0;
-	}
-}
-
-static void prevPart(void) {
-	if(part_to_edit == 0){
-		part_to_edit = getCantTramos() - 1;
-	}
-	else{
-		part_to_edit--;
-	}
-}
-
 
 
 
 /*******************************************************************************
- * 						edit part n FUNCTIONS
+ * 						edit distancies FUNCTIONS
  ******************************************************************************/
 static void show_edit_part(void) {
+
 	currentStateItem = &edit_parts_items;
 	show_screen(TIME_BACK, POSITIONS);
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
