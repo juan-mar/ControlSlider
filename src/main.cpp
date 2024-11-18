@@ -53,12 +53,20 @@ void setup() {
     //Set up encoder
     encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
 	encoder.setCount(0);
-    stepper.setEnableMotor(ON);
-    stepper.setSteps(0);
 
-    slider.modificarTramo(0,1000,10000,20);
+    setMotorEnable(ON);
+    setStepRemainig(0);
 
- 
+
+    modifyNumTramos(ADD);
+    modifyNumTramos(ADD);
+
+
+    modifyMovement(1, 1000,2000,5);
+    modifyMovement(2, 2000,1000,10);
+    modifyMovement(3, 1000,3000,15);   
+    setState(RUNNING);
+
 }
 
 void loop() {
@@ -94,19 +102,14 @@ void loop() {
         timer_3 = millis();
     }
 
+
     if(getStateSlider() == RUNNING){
-        updateMotor();
+        runMotor();
+        if(getStepCurrent() < getXf(getCurrentTramo())){
+            updateMotor();
+        }
     }
 
-
-    
-    //if(stepper.getStepsRemainig()){
-    //    if(micros() - timer_2 > (1000/2)){
-    //        stepper.sendStep();
-    //        timer_2 = micros();
-    //    }
-    //}
-    //updateMotorSlider();
     
 }
 

@@ -25,6 +25,8 @@ static Slider slider;
 static Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
 
 
+
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -34,6 +36,7 @@ static Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
  ******************************************************************************/
 static uint64_t timer_2 = 0;
 static int state;
+static int currentTramo;
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS
@@ -42,7 +45,7 @@ void InitSlider()
 {
     state = STOPPED;
     slider.numTramos = 1;
-
+    currentTramo = 0;
 }
 
 /*******************************************************************************
@@ -83,6 +86,16 @@ void setState(int estado)
 int getStateSlider()
 {
     return state;
+}
+
+uint64_t getXf(int tramo)
+{
+    return slider.getXf(tramo);
+}
+
+int getCurrentTramo()
+{
+    return currentTramo;
 }
 
 
@@ -142,10 +155,10 @@ void setTimeConst(uint64_t time)
     stepper.setTimeConst(time);
 }
 
-void setMotor()
+void runMotor()
 {
     static int tramos_faltantes = slider.numTramos;
-    static int currentTramo = 0;
+    int currentTramo = 0;
     static int cantTramos = slider.numTramos;
     static int newTramo = 1;
     if(newTramo){   

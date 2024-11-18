@@ -39,6 +39,11 @@ void setState(int estado);                                                  //Se
 
 int getStateSlider();                                                       //Indica el estado actual del slider
 
+uint64_t getXf(int tramo);                                                  //Devuelve la posicion final de un tramo
+
+int getCurrentTramo();
+
+
 
 //Funciones para Motor
 void move2origin(Button * inicioLinea);                                     //Mueve el motor a x0
@@ -47,7 +52,7 @@ void updateMotor();                                                         //se
 
 void setTimeConst(uint64_t time);                                           //Setea la constante de tiempo
 
-void setMotor();                                                            //Mueve el motor
+void runMotor();                                                            //Mueve el motor
 
 void setMotorDir(int dir);
 
