@@ -71,9 +71,11 @@ enum cursor_fil{FILA0 = 0, FILA1};
 
 
 // RUNNING
-#define RUN              "Running...      "
+#define RUN              " ReStart        "
 #define PAUSE_FINISH     " Pause   Finish "
 #define RESUME_FINISH    " Resume  Finish "
+#define RESTART_COL      0  
+#define RESTART_FIL      0
 #define PAUSE_COL       0
 #define PAUSE_FIL       1
 #define FINISH_COL      8

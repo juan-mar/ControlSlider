@@ -33,8 +33,9 @@ extern state_edge_t selec_delta_t[];
  ******************************************************************************/
 enum eventos{
 	RUN_ = 100,
-	PAUSE_,
+	PAUSE_RESUME,
 	FINISH,
+	RESTART,
 	SETTING,
 	BLUETOOTH,
 	MANUAL,
@@ -124,7 +125,12 @@ static void stop_ini_x(void);
 static void increment_time(void);
 static void decrement_time(void);
 static void next_time(void);
+
+//rutinas de run
 static void run_slider(void);
+static void restart(void);
+static void pause_resume(void);
+static void finish(void);
 
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
@@ -246,20 +252,20 @@ state_edge_t edit_times[] = {
 //TODO: Implementar los estados de run
 state_edge_t run[] = {
     //Eventos de EventGenerator
-	{ENCODER_RIGHT, run, nextItem, run_slider},
-    {ENCODER_LEFT, run, prevItem, run_slider},
-	{ENCODER_SWITCH, run, selectItem, run_slider},
+	{ENCODER_RIGHT, run, nextItem, show_run},
+    {ENCODER_LEFT, run, prevItem, show_run},
+	{ENCODER_SWITCH, run, selectItem, show_run},
     
-	{INIT_OF_LINE, run, do_nothing, run_slider},
-    {END_OF_LINE, run, do_nothing, run_slider},
+	{INIT_OF_LINE, run, do_nothing, show_run},
+    {END_OF_LINE, run, do_nothing, show_run},
 
 	//Eventos de transiscion
-	{PAUSE_, run, do_nothing, run_slider},
-	{FINISH, run, do_nothing, run_slider},
-	{BACK, menu, do_nothing, run_slider},
+	{PAUSE_RESUME, run, pause_resume, show_run},
+	{RESTART, run, restart, show_run},
+	{FINISH, menu, finish, show_menu},
+	{BACK, menu, do_nothing, show_menu},
 
-
-    {NONE, estado_init, do_nothing, run_slider}
+    {NONE, run, do_nothing, do_nothing}
 };
 
 
@@ -273,9 +279,9 @@ static menu_items_t main_menu_items = {{{0, RUN_, RUN_COL, RUN_FIL},
 									    {1, SETTING, SETTING_COL, SETTING_FIL}},
 									     0, 2};
 
-static menu_items_t run_items = {{{0, PAUSE_, PAUSE_COL, PAUSE_FIL},
+static menu_items_t run_items = {{{0, PAUSE_RESUME, PAUSE_COL, PAUSE_FIL},
 								  {1, FINISH, FINISH_COL, FINISH_FIL},
-								  {2, BACK, BACK_COL, BACK_FIL}},
+								  {2, RESTART, RESTART_COL, RESTART_FIL}},
 								   0, 3};
 
 static menu_items_t setting_items = {{{0, MANUAL, MANUAL_COL, MANUAL_FIL},
@@ -347,16 +353,6 @@ static void selectItem(void){
 static void show_menu(void){
 	currentStateItem = &main_menu_items;
 	show_screen(MENU_TITLE, MENU_LINE1);
-	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
-				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
-}
-
-/*******************************************************************************
- * 						Run FUNCTIONS
- ******************************************************************************/
-static void show_run(void) {
-	currentStateItem = &run_items;
-	show_screen(RUN, PAUSE_FINISH);	
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
 				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 }
@@ -520,11 +516,49 @@ static void next_time(void) {
 /*******************************************************************************
  * 						run FUNCTIONS
  ******************************************************************************/
+/*******************************************************************************
+ * 						Run FUNCTIONS
+ ******************************************************************************/
+static void show_run(void) {
+	currentStateItem = &run_items;
+
+	switch (getStateSlider())
+	{
+	case PAUSED:
+		show_screen(RUN, RESUME_FINISH);
+		break;
+	case RUNNING:
+		show_screen(RUN, PAUSE_FINISH);	
+		break;
+	//case FINISHED:
+		/* code */
+	//	break;
+	default:
+		show_screen(RUN, BLANK);	
+		break;
+	}
+	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+	//disp_write_number(getCurrStep(), 0, 1);
+}
+
+static void restart(void){
+	setState(RUNNING);
+}
+
+static void pause_resume(void){
+	if(getStateSlider() == RUNNING){
+		setState(PAUSED);
+	}
+	else if(getStateSlider() == PAUSED){
+		setState(RUNNING);
+	}
+}	
+
+static void finish(void){
+	setState(STOPPED);
+}
+
 static void run_slider(void){
-				
-	
-
-
-
 
 }
