@@ -45,7 +45,9 @@ void InitSlider()
 
 }
 
-
+/*******************************************************************************
+ * Slider Functions
+ ******************************************************************************/
 void storeMovement(uint64_t x0, uint64_t xf, uint64_t tiempo)
 {
     slider.agregarTramo(x0, xf, tiempo);
@@ -68,7 +70,25 @@ void modifyNumTramos(bool action)
     }
 }
 
+int getCantTramos()
+{
+    return slider.numTramos;
+}
 
+void setState(int estado)
+{
+    state = estado;
+}
+
+int getStateSlider()
+{
+    return state;
+}
+
+
+/*******************************************************************************
+ * Motor Functions
+ ******************************************************************************/
 void move2origin(Button * inicioLinea)
 {
     static int go_origin = 1;
@@ -157,7 +177,7 @@ void setMotorEnable(int enable)
     stepper.setEnableMotor(enable);
 }
 
-void setMotorSteps(int step)
+void setMoreSteps(int step)
 {
     stepper.setMoreSteps(step);
 }
@@ -192,17 +212,3 @@ uint64_t getStepCurrent()
     return stepper.getStepCurr();
 }
 
-int getCantTramos()
-{
-    return slider.numTramos;
-}
-
-void setState(int estado)
-{
-    state = estado;
-}
-
-int getStateSlider()
-{
-    return state;
-}
