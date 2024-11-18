@@ -33,9 +33,9 @@ void Slider::borrarUltimoTramo(){
 }
 
 void Slider::modificarTramo(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo){
-    distanciasTramos[tramo][0] = x0;
-    distanciasTramos[tramo][1] = xf;
-    tiemposTramos[tramo] = tiempo;
+    distanciasTramos[tramo - 1][0] = x0;
+    distanciasTramos[tramo - 1][1] = xf;
+    tiemposTramos[tramo - 1] = tiempo;
 }
 
 uint64_t Slider::getX0(int tramo){
