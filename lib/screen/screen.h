@@ -54,11 +54,11 @@ enum cursor_fil{FILA0 = 0, FILA1};
 
 
 // SELECT PARTS
-#define PARTS            " Edit Part:    B"
-#define ADD_DEL          " Add         Del"
+#define PARTS            " Set Parts     B"
+#define ADD_DEL          "Cant:   Add  Del"
 #define EDIT_PARTS_COL  0
 #define EDIT_PARTS_FIL  0
-#define ADD_PART_COL    0
+#define ADD_PART_COL    7
 #define ADD_PART_FIL    1
 #define DEL_COL         12
 #define DEL_FIL         1
@@ -67,15 +67,30 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define NUN_PARTS_COL   12
 
 
-// EDIT PART
-#define TIME_BACK        " T:    s       B"
-#define POSITIONS        " Xo:     Xf:    "
+// SET PARTS
+#define TIME_BACK        " Times         B"
+#define POSITIONS        " Distancies     "
 #define X0_COL          0
 #define X0_FIL          1
 #define XF_COL          8
 #define XF_FIL          1
 #define SEL_TIME_COL    0
 #define SEL_TIME_FIL    0
+
+//SET DISTANCES
+#define DISTANCES_0       " X0:    cm     B"
+#define DISTANCES_n       " X :    cm      "
+
+// SET TIMES
+#define TIME_SELECT_0     " Time 1:    s  B"
+#define TIME_SELECT_n     " Time_ :    s   "
+
+
+
+
+
+
+
 
 
 
