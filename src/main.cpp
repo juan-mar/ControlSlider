@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "CircularBuffer.h"
-#include "fsm.h"
-#include "fsmTable.h"
+//#include "fsm.h"
+//#include "fsmTable.h"
 #include "screen.h"
 #include "Display.h"
 #include "board.h"
@@ -38,13 +38,13 @@ uint64_t timer_3 = 0;
 #define MAX_EVENT   100
 
 //State machine
-state_t state;
+//state_t state;
 
 void setup() {
     Serial.begin(115200);
     
     EG_init();
-    state = FSM_GetInitState();
+//    state = FSM_GetInitState();
     EG_addExternEvent(NONE);
     InitDisp();
     show_screen("Hello World.....", BLANK);
@@ -70,7 +70,7 @@ void setup() {
 }
 
 void loop() {
-
+/*
     //si no hay emergencia
     if(paradaEmergencia == false){ 
         if(!EG_isEmpty()){
@@ -85,6 +85,7 @@ void loop() {
         rutinaEmergencia();   
 
     }
+*/
     
     
 
@@ -166,7 +167,7 @@ void rutinaEmergencia(){
             stepper.setSteps(0);
 
         }
-    */
+    
     
     if(!EG_isEmpty()){
         byte_t event = (byte_t)(EG_getEvent());
@@ -216,5 +217,6 @@ void rutinaEmergencia(){
             break;
         }
     }
+*/
 }
 
