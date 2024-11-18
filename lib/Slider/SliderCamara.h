@@ -60,7 +60,9 @@ void setMotorEnable(int enable);
 
 void setMoreSteps(int step);
 
-void getCurrStep();
+uint64_t getCurrStep();
+
+int getMotorDir();
 
 bool getEnableMotor();
 

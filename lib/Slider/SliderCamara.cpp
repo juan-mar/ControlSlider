@@ -213,9 +213,9 @@ void setMoreSteps(int step)
     stepper.setMoreSteps(step);
 }
 
-void getCurrStep()
+uint64_t getCurrStep()
 {
-    stepper.getStepCurr();
+    return stepper.getStepCurr();
 }
 
 bool getEnableMotor()
@@ -243,3 +243,7 @@ uint64_t getStepCurrent()
     return stepper.getStepCurr();
 }
 
+int getMotorDir()
+{
+    return stepper.getDir();
+}

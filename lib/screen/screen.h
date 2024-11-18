@@ -7,13 +7,6 @@ enum cursor_col{COL0 = 0, COL1, COL2, COL3, COL4, COL5, COL6, COL7, COL8, COL9, 
 enum cursor_fil{FILA0 = 0, FILA1};
 
 // Define positions for menu items
-#define PAUSE_COL       0
-#define PAUSE_FIL       0
-#define FINISH_COL      1
-#define FINISH_FIL      1
-#define BACK_COL        2
-#define BACK_FIL        2
-
 #define SEL_DIS_COL     0
 #define SEL_DIS_FIL     0
 #define LEFT_COL        2
@@ -22,14 +15,6 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define RIGHT_FIL       3
 #define OK_COL          4
 #define OK_FIL          4
-#define DIGIT_0_COL     0
-#define DIGIT_0_FIL     0
-#define DIGIT_1_COL     1
-#define DIGIT_1_FIL     1
-#define DIGIT_2_COL     2
-#define DIGIT_2_FIL     2
-#define DIGIT_3_COL     3
-#define DIGIT_3_FIL     3
 
 
 // PANTALLA DE INICIO
@@ -62,9 +47,8 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define ADD_PART_FIL    1
 #define DEL_COL         12
 #define DEL_FIL         1
-#define SEL_PART_COL    11
-#define SEL_PART_FIL    0
-#define NUN_PARTS_COL   12
+#define CANT_PART_COL   5
+#define CANT_PART_FIL   1
 
 
 // SET PARTS
@@ -76,31 +60,23 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define DISTANCES_FIL   1
 
 //EDIT DISTANCES
-#define DISTANCES_0       " X0:    cm     B"
-#define DISTANCES_n       " X :    cm      "
+#define DISTANCES_n       " X :     cm     "
+#define DIS_COL          0
+#define DIS_FIL          0
 
 //EDIT TIMES
-#define TIME_SELECT_0     " Time 1:    s  B"
-#define TIME_SELECT_n     " Time_ :    s   "
+#define TIME_SELECT_0     " Time :     s   "
+#define TIME_COL          0
+#define TIME_FIL          0
 
-
-
-
-
-
-
-
-
-
-
-#define OFFSET_XF        7
-#define OFFSET_B         15
-#define OFFSET_VEL       7
 
 // RUNNING
 #define RUN              "Running...      "
 #define PAUSE_FINISH     " Pause   Finish "
-
-#define OFFSET_PER       12  // para poner el porcentaje si se desea // SCREEN_H
+#define RESUME_FINISH    " Resume  Finish "
+#define PAUSE_COL       0
+#define PAUSE_FIL       1
+#define FINISH_COL      8
+#define FINISH_FIL      1
 
 #endif // SCREEN_H

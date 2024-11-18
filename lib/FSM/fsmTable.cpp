@@ -43,16 +43,9 @@ enum eventos{
 	DELETE_PART,
 	SET_DIS,
 	SET_TIMES,
-	SELEC_VEL,
-	X0,
-	XF,
 	RIGH,
 	LEFT,
 	OK_,
-	DIGIT_0,
-	DIGIT_1,
-	DIGIT_2,
-	DIGIT_3,
 	BACK
 };
 
@@ -100,7 +93,6 @@ static void show_set_manually(void);
 static void show_set_parts(void);
 static void show_edit_dis(void);
 static void show_edit_time(void);
-static void show_select_delta_t(void);
 
 
 
@@ -113,18 +105,25 @@ static void selectItem(void);
 static void activeBluetooth(void);
 
 //set manually and Selec part to edit
-static void selectPart(void);
 static void add_part(void);
 static void delete_part(void);
 
+//Set parts FUNCTIONS
+static void nextPart(void);
+static void prevPart(void);
+static void selectPart(void);
+
 //rutinas de select x0 y xf
-static void show_selec_x(void);
-static void select_x(void);
+static void select_next_x(void);
 static void increment_x(void);	
 static void decrement_x(void);
-static void stop_limit_x(void);
+static void stop_fin_x(void);
+static void stop_ini_x(void);
 
-
+//rutinas de select delta T
+static void increment_time(void);
+static void decrement_time(void);
+static void next_time(void);
 static void run_slider(void);
 
 /*******************************************************************************
@@ -191,8 +190,8 @@ state_edge_t set_manually[] = {
 
 	//Eventos de transiscion
 	{SET_PARTS, set_parts, do_nothing, show_set_parts},
-	{ADD_PART, set_manually, do_nothing, show_set_manually},
-	{DELETE_PART, set_manually, do_nothing, show_set_manually},
+	{ADD_PART, set_manually, add_part, show_set_manually},
+	{DELETE_PART, set_manually, delete_part, show_set_manually},
 	{BACK, settings, show_settings, show_settings},
 	{NONE, set_manually, do_nothing, show_set_manually}
 };
@@ -216,67 +215,31 @@ state_edge_t set_parts[] = {
 
 state_edge_t edit_distances[] = {
     //Eventos de EventGenerator
-	{ENCODER_RIGHT, edit_distances, nextItem, show_edit_dis},
-	{ENCODER_LEFT, edit_distances, prevItem, show_edit_dis},
-	{ENCODER_SWITCH, selec_x, selectItem, show_edit_dis},
+	{ENCODER_RIGHT, edit_distances, increment_x, show_edit_dis},
+	{ENCODER_LEFT, edit_distances, decrement_x, show_edit_dis},
+	{ENCODER_SWITCH, edit_distances, nextPart, show_edit_dis},
 
-	{INIT_OF_LINE, edit_distances, do_nothing, show_edit_dis},
-	{END_OF_LINE, edit_distances, do_nothing, show_edit_dis},
+	{INIT_OF_LINE, edit_distances, stop_fin_x, show_edit_dis},
+	{END_OF_LINE, edit_distances, stop_ini_x, show_edit_dis},
 
 	//Eventos de transiscion
 	{BACK, set_parts, do_nothing, show_set_parts},
-	
-    {NONE, estado_init, do_nothing, do_nothing}
-};
-
-state_edge_t selec_x[] = {
-	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_x, increment_x, show_selec_x},
-	{ENCODER_LEFT, selec_x, decrement_x, show_selec_x},
-	{ENCODER_SWITCH, edit_distances, select_x, show_edit_dis},
-
-	{INIT_OF_LINE, selec_x, stop_limit_x0, show_selec_x},
-	{END_OF_LINE, selec_x, stop_limit_x0, show_selec_x},
-
-	//Eventos de transiscion
-	
-	{NONE, selec_x, do_nothing, do_nothing}
+	{NONE, estado_init, do_nothing, do_nothing}
 };
 
 state_edge_t edit_times[] = {
     //Eventos de EventGenerator
-	{ENCODER_RIGHT, edit_parts, nextItem, show_edit_part},
-	{ENCODER_LEFT, edit_parts, prevItem, show_edit_part},
-	{ENCODER_SWITCH, edit_parts, selectItem, show_edit_part},
+	{ENCODER_RIGHT, edit_times, increment_time, show_edit_time},
+	{ENCODER_LEFT, edit_times, decrement_time, show_edit_time},
+	{ENCODER_SWITCH, edit_times, next_time, show_edit_time},
 
-	{INIT_OF_LINE, edit_parts, do_nothing, show_edit_part},
-	{END_OF_LINE, edit_parts, do_nothing, show_edit_part},
+	{INIT_OF_LINE, edit_times, do_nothing, show_edit_time},
+	{END_OF_LINE, edit_times, do_nothing, show_edit_time},
 
 	//Eventos de transiscion
-	
+	{BACK, set_parts, do_nothing, show_set_parts},
     {NONE, estado_init, do_nothing, do_nothing}
 };
-
-
-state_edge_t selec_delta_t[] = {
-	//eventos de EventGenerator
-	{ENCODER_RIGHT, selec_delta_t, nextItem, show_part_to_edit},
-	{ENCODER_LEFT, selec_delta_t, prevItem, show_part_to_edit},
-	{ENCODER_SWITCH, selec_delta_t, selectItem, show_part_to_edit},
-
-	{INIT_OF_LINE, selec_delta_t, do_nothing, show_part_to_edit},
-	{END_OF_LINE, selec_delta_t, do_nothing, show_part_to_edit},
-
-	//Eventos de transiscion
-	{DIGIT_0, selec_delta_t, do_nothing, do_nothing},
-	{DIGIT_1, selec_delta_t, do_nothing, do_nothing},
-	{DIGIT_2, selec_delta_t, do_nothing, do_nothing},
-	{DIGIT_3, selec_delta_t, do_nothing, do_nothing},
-	{OK_, edit_parts, do_nothing, do_nothing},
-
-	{NONE, estado_init, do_nothing, do_nothing}
-};
-
 
 
 
@@ -307,13 +270,13 @@ state_edge_t run[] = {
 static menu_items_t * currentStateItem;
 
 static menu_items_t main_menu_items = {{{0, RUN_, RUN_COL, RUN_FIL},
-									   {1, SETTING, SETTING_COL, SETTING_FIL}},
-									   0, 2};
+									    {1, SETTING, SETTING_COL, SETTING_FIL}},
+									     0, 2};
 
 static menu_items_t run_items = {{{0, PAUSE_, PAUSE_COL, PAUSE_FIL},
-									{1, FINISH, FINISH_COL, FINISH_FIL},
+								  {1, FINISH, FINISH_COL, FINISH_FIL},
 								  {2, BACK, BACK_COL, BACK_FIL}},
-								  0, 3};
+								   0, 3};
 
 static menu_items_t setting_items = {{{0, MANUAL, MANUAL_COL, MANUAL_FIL},
 									  {1, BLUETOOTH, BLUETOOTH_COL, BLUETOOTH_FIL},
@@ -321,10 +284,10 @@ static menu_items_t setting_items = {{{0, MANUAL, MANUAL_COL, MANUAL_FIL},
 									   0, 3};
 
 static menu_items_t set_manually_items = {{{0, SET_PARTS, EDIT_PARTS_COL, EDIT_PARTS_FIL},
-										  {1, ADD_PART, ADD_PART_COL, ADD_PART_FIL},
-										  {2, DELETE_PART, DEL_COL, DEL_FIL},
-										  {3, BACK, BACK_COL, BACK_FIL}}, 
-										   0, 4};
+										   {1, ADD_PART, ADD_PART_COL, ADD_PART_FIL},
+										   {2, DELETE_PART, DEL_COL, DEL_FIL},
+										   {3, BACK, BACK_COL, BACK_FIL}}, 
+										    0, 4};
 
 static menu_items_t set_parts_items = {{{0, SET_TIMES, TIME_BK_COL, TIME_BK_FIL},
 										{1, SET_DIS, DISTANCES_COL, DISTANCES_FIL},
@@ -332,24 +295,9 @@ static menu_items_t set_parts_items = {{{0, SET_TIMES, TIME_BK_COL, TIME_BK_FIL}
 										 0, 3};
 
 
-
-static menu_items_t selec_numbers = {{{0, DIGIT_0, DIGIT_0_COL, DIGIT_0_FIL},
-									{1, DIGIT_1, DIGIT_1_COL, DIGIT_1_FIL},
-									{2, DIGIT_2, DIGIT_2_COL, DIGIT_2_FIL},
-									{3, DIGIT_3, DIGIT_3_COL, DIGIT_3_FIL},
-									{4, OK_, OK_COL, OK_FIL}},
-									0, 5};
-
 static uint8_t part_to_edit = 0;
-static tramo_t tramos[5] = {{0,100,10},
-							{VACIO,VACIO,VACIO},
-							{VACIO,VACIO,VACIO},
-							{VACIO,VACIO,VACIO},
-							{VACIO,VACIO,VACIO}};
-
-							
-
-
+static uint64_t points[5+1] = {0};						
+static uint64_t times[5] = {0};
 /*******************************************************************************
  *******************************************************************************
                         GLOBAL FUNCTION DEFINITIONS
@@ -458,15 +406,14 @@ static void show_set_manually(void) {
 	show_screen(PARTS, ADD_DEL);
 	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
 				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+	disp_write_number(getCantTramos(), CANT_PART_COL, CANT_PART_FIL);
 }
 
 static void add_part(void) {
 	if(getCantTramos() < 5){
 		modifyNumTramos(ADD);
-		tramos[getCantTramos()-1].x0 = tramos[getCantTramos()-2].xf;
-		tramos[getCantTramos()-1].xf = tramos[getCantTramos()-1].x0 + 100;	
-		tramos[getCantTramos()-1].tiempo = 10;
-		modifyMovement(getCantTramos()-1, VACIO, VACIO, VACIO);	
+		//tramo por defecto
+		modifyMovement(getCantTramos()-1, 0, 0, 0);
 	}
 }
 
@@ -485,148 +432,89 @@ static void show_set_parts(void) {
 }
 
 
-
 /*******************************************************************************
  * 						edit distancies FUNCTIONS
  ******************************************************************************/
-static void show_edit_part(void) {
+static void show_edit_dis(void) {
+	show_screen(DISTANCES_n, BLANK);
+	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
+	disp_write_number(getStepCurrent(), DIS_COL+5, DIS_FIL);
+}
 
-	currentStateItem = &edit_parts_items;
-	show_screen(TIME_BACK, POSITIONS);
-	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
-				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
-	//Upload valores del tramo a editar
 
+static void nextPart(void){
+	points[part_to_edit] = getStepCurrent();
+	if(part_to_edit < getCantTramos()){
+		//quedan tramos por editar
+		part_to_edit++;
+	}
+	else{
+		//todos los tramos fueron editados
+		part_to_edit = 0;
+		for(int i = 0; i < getCantTramos(); i++){
+			modifyMovement(i, points[i], points[i+1], 0);
+		}
+		EG_addExternEvent((events_t)BACK);
+	}
+}
+
+static void increment_x(void) {	
+	setMotorDir(ANTIHORARIO);	//antihorario
+	setMoreSteps(STEP);
+}
+
+static void decrement_x(void) {	
+	setMotorDir(HORARIO);	//horario
+	setMoreSteps(STEP);
+}
+
+static void stop_fin_x(void) {
+	if(getMotorDir() == ANTIHORARIO){
+		setStepRemainig(0);
+	}
+}
+
+static void stop_ini_x(void) {
+	if(getMotorDir() == HORARIO){
+		setStepRemainig(0);
+		setStepCurrent(0);
+	}
 }
 
 /*******************************************************************************
- * 						selec X0 y Xf FUNCTIONS
+ * 						selec time FUNCTIONS
  ******************************************************************************/
-//------------------------------------X0-----------------------------------------
-static void show_selec_x0(void) {
-	show_screen(TIME_BACK, POSITIONS);
-	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
-				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
-	disp_write_number(tramos[part_to_edit].x0, X0_COL + 4, X0_FIL);
-	disp_write_number(tramos[part_to_edit].tiempo, SEL_TIME_COL + 3, SEL_TIME_FIL);
+static void show_select_time(void) {
+	show_screen(TIME_SELECT_0, BLANK);
+	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
+	disp_write_number(times[part_to_edit], TIME_COL+7, TIME_FIL);
+
 }	
 
-static void select_x0(void) {
-	if(part_to_edit > 0){
-		tramos[part_to_edit-1].xf = tramos[part_to_edit].x0;
-		if(tramos[part_to_edit].x0 > tramos[part_to_edit-1].xf){
-			//Se agranda el tramo anterior por ser X0_actual > Xf_prev
-			//verifico que tiempo en el tramo sea el correcto
-			uint64_t delta_time_steps = (1000*1000*(tramos[part_to_edit-1].xf - tramos[part_to_edit-1].x0))/tramos[part_to_edit-1].tiempo;
-			if(delta_time_steps < MAX_VEL){
-				delta_time_steps = MAX_VEL;
-				tramos[part_to_edit-1].tiempo = (1000*1000*(tramos[part_to_edit-1].xf - tramos[part_to_edit-1].x0))/MAX_VEL;			
-			}		
+static void increment_time(void) {
+	if(	times[part_to_edit] + TIME_STEP_S < 9999){
+		times[part_to_edit] += TIME_STEP_S;
+	}
+		
+}
+
+static void decrement_time(void) {
+	if(times[part_to_edit] - TIME_STEP_S > 0){
+		times[part_to_edit] -= TIME_STEP_S;
+	}
+}
+
+static void next_time(void) {
+	if(part_to_edit < getCantTramos()-1){
+		part_to_edit++;
+	}
+	else{
+		part_to_edit = 0;
+		for(int i = 0; i < getCantTramos(); i++){
+			modifyMovement(i, points[i], points[i+1], times[i]);
 		}
-		modifyMovement(part_to_edit, tramos[part_to_edit-1].x0, tramos[part_to_edit-1].xf, tramos[part_to_edit-1].tiempo);
+		EG_addExternEvent((events_t)BACK);
 	}
-	else{
-		modifyMovement(part_to_edit, tramos[part_to_edit].x0, tramos[part_to_edit].xf, tramos[part_to_edit].tiempo);
-	}
-}
-
-static void increment_x0(void) {	
-	setMotorDir(ANTIHORARIO);	//antihorario
-	tramos[part_to_edit].x0 += STEP;
-	setMoreSteps(STEP);
-}
-
-static void decrement_x0(void) {	
-	setMotorDir(HORARIO);	//horario
-	if(tramos[part_to_edit].x0 > STEP){
-		tramos[part_to_edit].x0 -= STEP;
-		setMoreSteps(STEP);
-	}
-	else{
-		setStepRemainig(tramos[part_to_edit].x0);
-		tramos[part_to_edit].x0 = 0;
-	}
-}
-
-static void stop_limit_x0(void) {
-	uint64_t steps = getStepRemainig();
-	setStepRemainig(0);
-	tramos[part_to_edit].x0 -= steps;
-	//otra opcion
-	//tramos[part_to_edit].x0 = getCurrentStep();
-}
-
-//------------------------------------Xf-----------------------------------------
-static void show_selec_xf(void) {
-	show_screen(TIME_BACK, POSITIONS);
-	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
-				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
-	disp_write_number(tramos[part_to_edit].xf, XF_COL + 4, XF_FIL);
-	disp_write_number(tramos[part_to_edit].tiempo, SEL_TIME_COL + 3, SEL_TIME_FIL);
-}
-
-static void select_xf(void) {
-	if(part_to_edit > 0 && part_to_edit < getCantTramos()-1){
-		//no es el ultimo tramo
-		tramos[part_to_edit+1].x0 = tramos[part_to_edit].xf;
-		if(tramos[part_to_edit].xf < tramos[part_to_edit+1].x0){
-			//Se agranda el tramo siguiente por ser Xf_actual < X0_next
-			//verifico que tiempo en el tramo sea el correcto
-			uint64_t delta_time_steps = (1000*1000*(tramos[part_to_edit+1].xf - tramos[part_to_edit+1].x0))/tramos[part_to_edit+1].tiempo;
-			if(delta_time_steps < MAX_VEL){
-				delta_time_steps = MAX_VEL;
-				tramos[part_to_edit+1].tiempo = (1000*1000*(tramos[part_to_edit+1].xf - tramos[part_to_edit+1].x0))/MAX_VEL;			
-			}
-		}
-		modifyMovement(part_to_edit, tramos[part_to_edit+1].x0, tramos[part_to_edit+1].xf, tramos[part_to_edit+1].tiempo);
-	}
-	//es el ultimo tramo
-	//verifico que tiempo en el tramo sea el correcto
-	uint64_t delta_time_steps = (1000*1000*(tramos[part_to_edit].xf - tramos[part_to_edit].x0))/tramos[part_to_edit].tiempo;
-	if(delta_time_steps < MAX_VEL){
-		delta_time_steps = MAX_VEL;
-		tramos[part_to_edit].tiempo = (1000*1000*(tramos[part_to_edit].xf - tramos[part_to_edit].x0))/MAX_VEL;			
-	}
-	modifyMovement(part_to_edit, tramos[part_to_edit].x0, tramos[part_to_edit].xf, tramos[part_to_edit].tiempo);
-}
-
-static void increment_xf(void) {
-	tramos[part_to_edit].xf += STEP;
-	setMoreSteps(STEP);
-	setMotorDir(ANTIHORARIO);	
-}
-
-static void decrement_xf(void){
-	if(tramos[part_to_edit].xf - STEP > tramos[part_to_edit].x0){
-		tramos[part_to_edit].xf -= STEP;
-		setMoreSteps(STEP);
-	}
-	else{
-		//Si quiero decrementar menos de lo que ya tengo en x0 no puedo (do_nothing)
-		//setStepRemainig(tramos[part_to_edit].xf);
-		//tramos[part_to_edit].xf = tramos[part_to_edit].x0;
-	}
-	setMotorDir(HORARIO);	
-}
-
-static void stop_limit_xf(void) {
-	uint64_t steps = getStepRemainig();
-	setStepRemainig(0);
-	tramos[part_to_edit].xf -= steps;
-	//otra opcion
-	//tramos[part_to_edit].xf = getCurrentStep();
-}
-
-/*******************************************************************************
- * 						selec delta T FUNCTIONS
- ******************************************************************************/
-//TODO: Implementar las funciones de seleccion de delta T
-static void show_select_delta_t(void) {
-	currentStateItem = &selec_numbers;
-	show_screen(BLANK, BLANK);
-	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
-				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
-
 }	
 
 /*******************************************************************************
