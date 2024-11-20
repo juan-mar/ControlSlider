@@ -66,7 +66,7 @@ int getMotorDir();
 
 bool getEnableMotor();
 
-void setStepRemainig(int step);
+void setStepRemaining(int step);
 
 uint64_t getStepRemainig();
 

@@ -158,12 +158,11 @@ void readButtons(void){
 }
 
 void rutinaEmergencia(){
-    /*
+    
         if(emergencia.getState() == PRESS){
             paradaEmergencia = false;
             EG_addExternEvent(NONE);
-            stepper.setSteps(0);
-
+            setStepRemaining(0);
         }
     
     
@@ -171,50 +170,50 @@ void rutinaEmergencia(){
         byte_t event = (byte_t)(EG_getEvent());
         switch (event){
         case ENCODER_SWITCH:
-            if(stepper.getEnableMotor() == OFF){
-                stepper.setEnableMotor(ON);
+            if(getEnableMotor() == OFF){
+                setMotorEnable(ON);
                 show_screen("Parada|Motor:ON ", "Motor -> encoder");
             }
             else{
-                stepper.setEnableMotor(OFF);
+                setMotorEnable(OFF);
                 show_screen("Parada|Motor:OFF", "Presione encoder");
-                stepper.setSteps(0);
-                stepper.setTimeConst(1000);
+                setStepRemaining(0);
+                setTimeConst(1000);
             }
             break;
         case ENCODER_LEFT:
-            if(stepper.getEnableMotor() == ON){
-                stepper.setDir(ANTIHORARIO);
-                stepper.setMoreSteps(50);
+            if(getEnableMotor() == ON){
+                setMotorDir(ANTIHORARIO);
+                setMoreSteps(50);
             }
             break;
         case ENCODER_RIGHT:
-            if(stepper.getEnableMotor() == ON){
-                stepper.setDir(HORARIO);
-                stepper.setMoreSteps(50);
+            if(getEnableMotor() == ON){
+                setMotorDir(HORARIO);
+                setMoreSteps(50);
             }
             break;
         case INIT_OF_LINE:
-            if(stepper.getEnableMotor() == ON && stepper.getDir() == HORARIO){  
-                stepper.setSteps(0);
+            if(getEnableMotor() == ON && getMotorDir() == HORARIO){  
+                setStepRemaining(0); 
             }
             break;
         case END_OF_LINE:
-            if(stepper.getEnableMotor() == ON && stepper.getDir() == ANTIHORARIO){
-                stepper.setSteps(0);
+            if(getEnableMotor() == ON && getMotorDir() == ANTIHORARIO){
+                setStepRemaining(0);
             }
             break;
         case NONE:
             show_screen("Parada|Motor:OFF", BLANK);
-            stepper.setEnableMotor(OFF);
-            stepper.setSteps(0);
-            stepper.setTimeConst(1000);
+            setMotorEnable(OFF);
+            setStepRemaining(0);
+            setTimeConst(1000);
             break;
 
         default:
             break;
         }
     }
-*/
+
 }
 

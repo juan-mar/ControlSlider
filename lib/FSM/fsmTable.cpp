@@ -466,13 +466,13 @@ static void decrement_x(void) {
 
 static void stop_fin_x(void) {
 	if(getMotorDir() == ANTIHORARIO){
-		setStepRemainig(0);
+		setStepRemaining(0);
 	}
 }
 
 static void stop_ini_x(void) {
 	if(getMotorDir() == HORARIO){
-		setStepRemainig(0);
+		setStepRemaining(0);
 		setStepCurrent(0);
 	}
 }

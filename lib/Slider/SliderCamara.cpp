@@ -223,7 +223,7 @@ bool getEnableMotor()
     return stepper.getEnableMotor();
 }
 
-void setStepRemainig(int step)
+void setStepRemaining(int step)
 {
     stepper.setSteps(step);
 }
