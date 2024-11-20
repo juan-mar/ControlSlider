@@ -11,11 +11,15 @@
 /*******************************************************************************
  * DEFINICION DE CONSTANTES
  ******************************************************************************/
-#define STOPPED 0
-#define RUNNING 1
-#define PAUSED  2
-#define SETTING_MOTOR 3
-#define FINISHED 4
+
+enum states_slider{
+    STOPPED,
+    START,
+    RUNNING,
+    PAUSED,
+    SETTING_MOTOR,
+    FINISHED
+};
 
 #define ADD     1
 #define ERASE   0
@@ -41,6 +45,8 @@ int getCantTramos();                                                        //De
 int getStateSlider();                                                       //Indica el estado actual del slider
 
 uint64_t getXf(int tramo);                                                  //Devuelve la posicion final de un tramo
+
+uint64_t getX0(int tramo);                                                  //Devuelve la posicion inicial de un tramo
 
 int getCurrentTramo();
 

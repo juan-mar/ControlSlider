@@ -81,5 +81,7 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define PAUSE_FIL       1
 #define FINISH_COL      8
 #define FINISH_FIL      1
+#define PROGRESS_COL    9
+#define PROGRESS_FIL    0
 
 #endif // SCREEN_H

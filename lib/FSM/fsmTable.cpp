@@ -157,7 +157,7 @@ state_edge_t menu[] = {
     {END_OF_LINE, menu, do_nothing, show_menu},
 
 	//Eventos de transiscion 
-	{RUN_, run, show_run, show_run},
+	{RUN_, run, run_slider, show_run},
 	{SETTING, settings, show_settings, show_settings},
 
     {NONE, menu, do_nothing, show_menu}
@@ -213,7 +213,7 @@ state_edge_t set_parts[] = {
 
 	//Eventos de transiscion
 	{SET_TIMES, edit_times, do_nothing, show_edit_time},
-	{SET_DIS, edit_distances, do_nothing, show_edit_dis},
+	{SET_DIS, edit_distances, settingMotor, show_edit_dis},
 	{BACK, set_manually, show_set_manually, show_set_manually},
 
 	{NONE, set_parts, do_nothing, show_set_parts}
@@ -265,7 +265,7 @@ state_edge_t run[] = {
 	{FINISH, menu, finish, show_menu},
 	{BACK, menu, do_nothing, show_menu},
 
-    {NONE, run, do_nothing, do_nothing}
+    {NONE, run, show_run, show_run}
 };
 
 
@@ -432,16 +432,15 @@ static void show_set_parts(void) {
  * 						edit distancies FUNCTIONS
  ******************************************************************************/
 static void show_edit_dis(void) {
-	setMotorEnable(ON);
-	setState(SETTING_MOTOR);
-
 	show_screen(DISTANCES_n, BLANK);
 	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
 	//disp_write_number(getStepCurrent(), DIS_COL+5, DIS_FIL);
 }
 
 static void settingMotor(){
-
+	setMotorEnable(ON);
+	setState(SETTING_MOTOR);
+	setTimeConst(MAX_VEL);
 }
 
 static void nextPart(void){
@@ -456,7 +455,7 @@ static void nextPart(void){
 		setMotorEnable(OFF);
 		part_to_edit = 0;
 		for(int i = 0; i < getCantTramos(); i++){
-			modifyMovement(i, points[i], points[i+1], 0);
+			modifyMovement(i+1, points[i], points[i+1], times[i]);
 		}
 		EG_addExternEvent((events_t)BACK);
 	}
@@ -468,8 +467,15 @@ static void increment_x(void) {
 }
 
 static void decrement_x(void) {	
-	setMotorDir(HORARIO);	//horario
-	setMoreSteps(STEP);
+	if(getStepCurrent() < STEP){
+		setStepRemaining(0);
+	}
+	else{
+		setMotorDir(HORARIO);	//horario
+		setMoreSteps(STEP);
+	}
+	//setMotorDir(HORARIO);	//horario
+	//setMoreSteps(STEP);
 }
 
 static void stop_fin_x(void) {
@@ -541,13 +547,16 @@ static void show_run(void) {
 	{
 	case PAUSED:
 		show_screen(RUN, RESUME_FINISH);
-		break;
 	case RUNNING:
 		show_screen(RUN, PAUSE_FINISH);	
 		break;
-	//case FINISHED:
+	case START:
+	case SETTING_MOTOR:
+	case STOPPED:
+	case FINISHED:
 		/* code */
-	//	break;
+		break;
+	
 	default:
 		show_screen(RUN, BLANK);	
 		break;
@@ -558,7 +567,7 @@ static void show_run(void) {
 }
 
 static void restart(void){
-	setState(RUNNING);
+	setState(START);
 }
 
 static void pause_resume(void){
@@ -572,8 +581,12 @@ static void pause_resume(void){
 
 static void finish(void){
 	setState(STOPPED);
+	setMotorEnable(OFF);
+	show_menu();
 }
 
 static void run_slider(void){
+	setState(START);
+	setMotorEnable(ON);	
 
 }

@@ -16,6 +16,7 @@
 #include "SliderCamara.h"
 #include "board.h"
 #include "Display.h"
+#include "EventGenerator.h"
 
 
 /*******************************************************************************
@@ -37,6 +38,8 @@ static Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
 static uint64_t timer_2 = 0;
 static int state;
 static int currentTramo;
+static int go_origin = 1;
+static int go_X0 = 0;
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS
@@ -122,31 +125,35 @@ int pasos2cm(uint64_t pasos)
  ******************************************************************************/
 void move2origin(Button * inicioLinea)
 {
-    static int go_origin = 1;
-    static int go_X0 = 0;
-
+    static bool show_one_time = true;
     if(go_origin){
-        show_screen("Yendo a inicio", "Moviendo motor");
-        stepper.setDir(HORARIO);
-        stepper.setEnableMotor(ON);
+        if(show_one_time){
+            show_screen("Yendo a inicio", "Moviendo motor");
+            show_one_time = false;
+        }
         if(inicioLinea-> getState()  == NOT_PRESSED){
             stepper.setTimeConst(1000/2);
+             stepper.setDir(HORARIO);
+            stepper.setEnableMotor(ON);
+            updateMotor();
         }
         else{
+            stepper.setStepCurrent(0);
             delay(500);
             go_origin = 0;
             go_X0 = 1;
-            stepper.setStepCurrent(0);
+            show_one_time = true;
         }
-
     }
     
-        //stepper.setEnableMotor(ON);
+    //stepper.setEnableMotor(ON);
     if(go_X0){
         stepper.setDir(ANTIHORARIO);
         uint64_t x0_ = slider.getX0(0);
-        show_screen("Yendo a x0", "Moviendo motor");
-
+        if(show_one_time){
+            show_screen("Yendo a x0", "Moviendo motor");
+            show_one_time = false;
+        }
         //Go to Initial Position
         if(stepper.getStepCurr() < x0_){
             stepper.setTimeConst(1000/2);
@@ -154,9 +161,14 @@ void move2origin(Button * inicioLinea)
         else{
             delay(500);
             go_X0 = 0;
-            go_origin = 0;
+            go_origin = 1;
+            setState(RUNNING);
+            EG_addExternEvent(NONE);
+            show_one_time = true;
         }
-        
+        if (stepper.getStepCurr() < slider.getX0(currentTramo)) {
+            updateMotor();
+        }
     }
 }
 
@@ -176,14 +188,22 @@ void setTimeConst(uint64_t time)
 
 void runMotor()
 {
-    static int tramos_faltantes = slider.numTramos;
     static int cantTramos = slider.numTramos;
     static int newTramo = 1;
     if(newTramo){   
         //Estoy en tramo current
-        show_screen("Moviendo motor", BLANK);
         stepper.calcConstTime(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
+
+        Serial.println("Tramo1_x0");
+        Serial.println(slider.getX0(currentTramo));
+        Serial.println("Tramo1_xf");
+        Serial.println(slider.getXf(currentTramo));   
+        Serial.println("Tiempo");
+        Serial.println(slider.getTiempo(currentTramo));
+        Serial.println("ConstTime");
+        Serial.println(stepper.getTimeConst());
+
         newTramo = 0;
     }
 
@@ -195,12 +215,11 @@ void runMotor()
     }
 
     if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
-//    if(stepper.getStepsRemainig()){
         newTramo = 0;
     }
     else{
         //Estoy en tramo siguiente
-        if(currentTramo < cantTramos){
+        if(currentTramo < cantTramos-1){
             currentTramo++;
             newTramo = 1;
         }
@@ -208,7 +227,6 @@ void runMotor()
             setState(STOPPED);
             currentTramo = 0;
             newTramo = 1;
-
         }
     }
     
@@ -263,4 +281,9 @@ uint64_t getStepCurrent()
 int getMotorDir()
 {
     return stepper.getDir();
+}
+
+uint64_t getX0(int tramo)
+{
+    return slider.getX0(tramo);
 }

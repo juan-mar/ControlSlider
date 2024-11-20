@@ -86,7 +86,6 @@ void loop() {
 
     }
     
-
     //Lectura de encoder y botones
     if(millis() - timer_1 > 100){
         readEncoder();
@@ -94,29 +93,39 @@ void loop() {
         timer_1 = millis();
     }
 
-
-   
-    
-
-    if(getStateSlider() == RUNNING){
-        move2origin(&inicioDeLinea);
-        runMotor();
-        if(getStepCurrent() < getXf(getCurrentTramo())){
-            updateMotor();
+    switch (getStateSlider()) {
+        case START:
+        {
+            move2origin(&inicioDeLinea);
+            
         }
-    }
-
-    if(getStateSlider() == SETTING_MOTOR){
-        if(getStepRemaining()){
-            updateMotor();
-        }
-        if(millis() - timer_3 > 50){
-                disp_write_number(getStepCurrent(),DIS_OFFSET,DIS_FIL);
-                //Serial.println(getStepCurrent());
+            break;
+        case RUNNING:
+        {
+            runMotor();
+            if (getStepCurrent() < getXf(getCurrentTramo())) {
+                updateMotor();
+            }
+            if (millis() - timer_3 > 200) {
+                disp_write_number(getStepCurrent(), PROGRESS_COL, PROGRESS_FIL);
                 timer_3 = millis();
+            }
+        } 
+            break;
+        case SETTING_MOTOR:
+        {
+            if (getStepRemaining()) {
+                updateMotor();
+            }
+            if (millis() - timer_3 > 50) {
+                disp_write_number(getStepCurrent(), DIS_OFFSET, DIS_FIL);
+                timer_3 = millis();
+            }
         }
+            break;
+        default:
+            break;
     }
-
 
 }
 
