@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "CircularBuffer.h"
-//#include "fsm.h"
-//#include "fsmTable.h"
+#include "fsm.h"
+#include "fsmTable.h"
 #include "screen.h"
 #include "Display.h"
 #include "board.h"
@@ -38,13 +38,13 @@ uint64_t timer_3 = 0;
 #define MAX_EVENT   100
 
 //State machine
-//state_t state;
+state_t state;
 
 void setup() {
     Serial.begin(115200);
     
     EG_init();
-//    state = FSM_GetInitState();
+    state = FSM_GetInitState();
     EG_addExternEvent(NONE);
     InitDisp();
     InitSlider();
@@ -55,13 +55,13 @@ void setup() {
     encoder.attachHalfQuad(PIN_ENCODER_A, PIN_ENCODER_B);
 	encoder.setCount(0);
 
-    modifyNumTramos(ADD);
-    modifyNumTramos(ADD);
+    //modifyNumTramos(ADD);
+    //modifyNumTramos(ADD);
 
-    modifyMovement(1, 0, 1000, 10);
-    modifyMovement(2, 1000, 3000,10);
-    modifyMovement(3, 3000, 5000,15);   
-    setState(RUNNING);
+    //modifyMovement(1, 0, 1000, 10);
+    //modifyMovement(2, 1000, 3000,10);
+    //modifyMovement(3, 3000, 5000,15);   
+    //setState(RUNNING);
     //Serial.println(getStateSlider());
     //Serial.println(getXf(getCurrentTramo()));
 
@@ -70,23 +70,21 @@ void setup() {
 }
 
 void loop() {
-/*
+
     //si no hay emergencia
-    if(paradaEmergencia == false){ 
+    //if(paradaEmergencia == false){ 
         if(!EG_isEmpty()){
             byte_t event = (byte_t)(EG_getEvent());
             Serial.println(event);
             state = fsm(state, event);
             state->actionState();
         }
-    }
-    else{
+    //}
+    //else{
         //codigo de emergencia
-        rutinaEmergencia();   
+    //    rutinaEmergencia();   
 
-    }
-*/
-    
+    //}
     
 
     //Lectura de encoder y botones
@@ -98,7 +96,7 @@ void loop() {
 
 
     if(millis() - timer_3 > 50){
-        disp_write_number(getStepCurrent(),0,1);
+        //disp_write_number(getStepCurrent(),0,1);
         //Serial.println(getStepCurrent());
         timer_3 = millis();
     }

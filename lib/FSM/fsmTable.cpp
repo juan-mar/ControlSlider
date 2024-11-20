@@ -111,11 +111,11 @@ static void delete_part(void);
 
 //Set parts FUNCTIONS
 static void nextPart(void);
-static void prevPart(void);
-static void selectPart(void);
+//static void prevPart(void);
+//static void selectPart(void);
 
 //rutinas de select x0 y xf
-static void select_next_x(void);
+//static void select_next_x(void);
 static void increment_x(void);	
 static void decrement_x(void);
 static void stop_fin_x(void);
@@ -480,12 +480,12 @@ static void stop_ini_x(void) {
 /*******************************************************************************
  * 						selec time FUNCTIONS
  ******************************************************************************/
-static void show_select_time(void) {
+static void show_edit_time(void) {
 	show_screen(TIME_SELECT_0, BLANK);
 	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
 	disp_write_number(times[part_to_edit], TIME_COL+7, TIME_FIL);
 
-}	
+}
 
 static void increment_time(void) {
 	if(	times[part_to_edit] + TIME_STEP_S < 9999){
