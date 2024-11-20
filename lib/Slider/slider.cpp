@@ -38,6 +38,10 @@ void Slider::modificarTramo(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo
     tiemposTramos[tramo - 1] = tiempo;
 }
 
+void Slider::setMaxPasos(uint64_t pasos){
+    maxPasos = pasos;
+}
+
 uint64_t Slider::getX0(int tramo){
     return distanciasTramos[tramo][0];
 }
@@ -49,5 +53,9 @@ uint64_t Slider::getXf(int tramo){
 
 uint64_t Slider::getTiempo(int tramo){
     return tiemposTramos[tramo];
+}
+
+uint64_t Slider::getMaxPasos(){
+    return maxPasos;
 }
 

@@ -80,6 +80,16 @@ int getCantTramos()
     return slider.numTramos;
 }
 
+uint64_t getMaxPasos()
+{
+    return slider.getMaxPasos();
+}
+
+void setMaxPasos(uint64_t pasos)
+{
+    slider.setMaxPasos(pasos);
+}
+
 void setState(int estado)
 {
     state = estado;
@@ -98,6 +108,12 @@ uint64_t getXf(int tramo)
 int getCurrentTramo()
 {
     return currentTramo;
+}
+
+int pasos2cm(uint64_t pasos)
+{
+    int dist = pasos*75/slider.maxPasos;
+    return dist;
 }
 
 

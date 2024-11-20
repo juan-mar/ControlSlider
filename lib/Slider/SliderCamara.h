@@ -44,9 +44,14 @@ uint64_t getXf(int tramo);                                                  //De
 
 int getCurrentTramo();
 
+uint64_t getMaxPasos();
+
 //Setters
+void setMaxPasos(uint64_t pasos);
+
 void setState(int estado);                                                  //Setea el flag de inicio de movimiento
 
+int pasos2cm(uint64_t pasos);                                           //Convierte pasos a cm
 
 
 //Funciones para Motor
