@@ -17,7 +17,7 @@ ESP32Encoder encoder;
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_LOW);
 Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
 Button finDeLinea = Button(PIN_END_LINE, ACT_HIGH);
-Button emergencia = Button(PIN_EMERGENCIA, ACT_HIGH);
+Button emergencia = Button(PIN_EMERGENCIA, ACT_LOW);
 bool paradaEmergencia = false;
 
 //Motor stepper = Motor(PIN_MOTOR_STEP, PIN_MOTOR_DIR, PIN_MOTOR_EN);
@@ -65,26 +65,26 @@ void setup() {
     //Serial.println(getStateSlider());
     //Serial.println(getXf(getCurrentTramo()));
 
-    setMotorEnable(ON);
+    //setMotorEnable(ON);
 
 }
 
 void loop() {
 
     //si no hay emergencia
-    //if(paradaEmergencia == false){ 
+    if(paradaEmergencia == false){ 
         if(!EG_isEmpty()){
             byte_t event = (byte_t)(EG_getEvent());
             Serial.println(event);
             state = fsm(state, event);
             state->actionState();
         }
-    //}
-    //else{
+    }
+    else{
         //codigo de emergencia
-    //    rutinaEmergencia();   
+        rutinaEmergencia();   
 
-    //}
+    }
     
 
     //Lectura de encoder y botones
@@ -95,12 +95,7 @@ void loop() {
     }
 
 
-    if(millis() - timer_3 > 50){
-        //disp_write_number(getStepCurrent(),0,1);
-        //Serial.println(getStepCurrent());
-        timer_3 = millis();
-    }
-
+   
     
 
     if(getStateSlider() == RUNNING){
@@ -110,6 +105,19 @@ void loop() {
             updateMotor();
         }
     }
+
+    if(getStateSlider() == SETTING_MOTOR){
+        if(getStepRemaining()){
+            updateMotor();
+        }
+        if(millis() - timer_3 > 50){
+                disp_write_number(getStepCurrent(),DIS_OFFSET,DIS_FIL);
+                //Serial.println(getStepCurrent());
+                timer_3 = millis();
+        }
+    }
+
+
 }
 
 

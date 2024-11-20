@@ -47,6 +47,7 @@ void InitSlider()
     slider.numTramos = 1;
     currentTramo = 0;
     setStepCurrent(0);
+    setMotorEnable(OFF);
 }
 
 /*******************************************************************************
@@ -228,7 +229,7 @@ void setStepRemaining(int step)
     stepper.setSteps(step);
 }
 
-uint64_t getStepRemainig()
+uint64_t getStepRemaining()
 {
     return stepper.getStepsRemainig();
 }

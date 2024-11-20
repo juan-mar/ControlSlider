@@ -14,6 +14,8 @@
 #define STOPPED 0
 #define RUNNING 1
 #define PAUSED  2
+#define SETTING_MOTOR 3
+#define FINISHED 4
 
 #define ADD     1
 #define ERASE   0
@@ -33,15 +35,17 @@ void modifyMovement(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo);  //Mo
 
 void modifyNumTramos(bool action);                                          //Modifica la cantidad de tramos
 
+//Getters
 int getCantTramos();                                                        //Devuelve la cantidad de tramos
-
-void setState(int estado);                                                  //Setea el flag de inicio de movimiento
 
 int getStateSlider();                                                       //Indica el estado actual del slider
 
 uint64_t getXf(int tramo);                                                  //Devuelve la posicion final de un tramo
 
 int getCurrentTramo();
+
+//Setters
+void setState(int estado);                                                  //Setea el flag de inicio de movimiento
 
 
 
@@ -50,9 +54,10 @@ void move2origin(Button * inicioLinea);                                     //Mu
 
 void updateMotor();                                                         //se llama desde el main para mover al motor
 
-void setTimeConst(uint64_t time);                                           //Setea la constante de tiempo
-
 void runMotor();                                                            //Mueve el motor
+
+//Setters
+void setTimeConst(uint64_t time);                                           //Setea la constante de tiempo
 
 void setMotorDir(int dir);
 
@@ -60,17 +65,18 @@ void setMotorEnable(int enable);
 
 void setMoreSteps(int step);
 
+void setStepRemaining(int step);
+
+void setStepCurrent(uint64_t step);
+
+//Getters
 uint64_t getCurrStep();
 
 int getMotorDir();
 
 bool getEnableMotor();
 
-void setStepRemaining(int step);
-
-uint64_t getStepRemainig();
-
-void setStepCurrent(uint64_t step);
+uint64_t getStepRemaining();
 
 uint64_t getStepCurrent();
 

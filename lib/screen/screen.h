@@ -53,7 +53,7 @@ enum cursor_fil{FILA0 = 0, FILA1};
 
 // SET PARTS
 #define TIME_BACK        " Times         B"
-#define POSITIONS        " Distancies     "
+#define POSITIONS        " Distances      "
 #define TIME_BK_COL     0
 #define TIME_BK_FIL     0
 #define DISTANCES_COL   0
@@ -63,6 +63,7 @@ enum cursor_fil{FILA0 = 0, FILA1};
 #define DISTANCES_n       " X :     cm     "
 #define DIS_COL          0
 #define DIS_FIL          0
+#define DIS_OFFSET       4
 
 //EDIT TIMES
 #define TIME_SELECT_0     " Time :     s   "

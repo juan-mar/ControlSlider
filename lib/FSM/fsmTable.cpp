@@ -115,7 +115,7 @@ static void nextPart(void);
 //static void selectPart(void);
 
 //rutinas de select x0 y xf
-//static void select_next_x(void);
+static void settingMotor(void);
 static void increment_x(void);	
 static void decrement_x(void);
 static void stop_fin_x(void);
@@ -432,11 +432,17 @@ static void show_set_parts(void) {
  * 						edit distancies FUNCTIONS
  ******************************************************************************/
 static void show_edit_dis(void) {
+	setMotorEnable(ON);
+	setState(SETTING_MOTOR);
+
 	show_screen(DISTANCES_n, BLANK);
 	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
-	disp_write_number(getStepCurrent(), DIS_COL+5, DIS_FIL);
+	//disp_write_number(getStepCurrent(), DIS_COL+5, DIS_FIL);
 }
 
+static void settingMotor(){
+
+}
 
 static void nextPart(void){
 	points[part_to_edit] = getStepCurrent();
@@ -446,6 +452,8 @@ static void nextPart(void){
 	}
 	else{
 		//todos los tramos fueron editados
+		setState(STOPPED);
+		setMotorEnable(OFF);
 		part_to_edit = 0;
 		for(int i = 0; i < getCantTramos(); i++){
 			modifyMovement(i, points[i], points[i+1], 0);
@@ -482,7 +490,7 @@ static void stop_ini_x(void) {
  ******************************************************************************/
 static void show_edit_time(void) {
 	show_screen(TIME_SELECT_0, BLANK);
-	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
+	disp_write_number(part_to_edit+1, DIS_COL+5, DIS_FIL);
 	disp_write_number(times[part_to_edit], TIME_COL+7, TIME_FIL);
 
 }
@@ -491,13 +499,20 @@ static void increment_time(void) {
 	if(	times[part_to_edit] + TIME_STEP_S < 9999){
 		times[part_to_edit] += TIME_STEP_S;
 	}
+	else{
+		times[part_to_edit] = 9999;
+	}
 		
 }
 
 static void decrement_time(void) {
-	if(times[part_to_edit] - TIME_STEP_S > 0){
+	if(times[part_to_edit] > TIME_STEP_S ){
 		times[part_to_edit] -= TIME_STEP_S;
 	}
+	else{
+		times[part_to_edit] = 0;
+	}
+
 }
 
 static void next_time(void) {
@@ -507,7 +522,7 @@ static void next_time(void) {
 	else{
 		part_to_edit = 0;
 		for(int i = 0; i < getCantTramos(); i++){
-			modifyMovement(i, points[i], points[i+1], times[i]);
+			modifyMovement(i+1, points[i], points[i+1], times[i]);
 		}
 		EG_addExternEvent((events_t)BACK);
 	}
