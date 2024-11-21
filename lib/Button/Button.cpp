@@ -56,13 +56,17 @@ stateButtton_t Button::getState(){
         this->prevState = NOT_PRESSED;
         return PRESSED;
     }
-    else if(state == PRESS){
+    else if(state == PRESS && prevState == NOT_PRESSED){
+        this->prevState = FLANCO_ACTIVACION;
+        return FLANCO_ACTIVACION;
+    }
+    else if(state == PRESS && prevState == FLANCO_ACTIVACION){
         this->prevState = PRESS;
         return PRESS;
     }
-    else{
-        this->prevState = NOT_PRESSED;
-        return NOT_PRESSED;
+    else if(state == PRESS && prevState == PRESS){
+        this->prevState = PRESS;
+        return PRESS;
     }
     
     return NOT_PRESSED;

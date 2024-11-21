@@ -20,7 +20,7 @@ enum states_slider{
     SETTING_MOTOR,
     FINISHED,
     MAP,
-    MANUAL_MODE
+    READY
 };
 
 #define ADD     1

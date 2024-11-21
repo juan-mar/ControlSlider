@@ -194,17 +194,6 @@ void runMotor()
         //Estoy en tramo current
         stepper.calcConstTime(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
-        Serial.println("Tramo:");
-        Serial.println(currentTramo);
-        Serial.println("Tramo1_x0");
-        Serial.println(slider.getX0(currentTramo));
-        Serial.println("Tramo1_xf");
-        Serial.println(slider.getXf(currentTramo));   
-        Serial.println("Tiempo");
-        Serial.println(slider.getTiempo(currentTramo));
-        Serial.println("ConstTime");
-        Serial.println(stepper.getTimeConst());
-
         newTramo = 0;
     }
 
@@ -299,6 +288,13 @@ void mapeoSlider(Button * inicioLinea, Button * finLinea){
     static int move_to_end = 1;
     static int move_to_start = 0;   
     static int move_adelante = 0;
+
+    static bool show_one_time = true;
+    if(show_one_time){
+        show_screen("Inicializando", BLANK);
+        show_one_time = false;
+    }
+
     //Move to end
     if(move_to_end){
         if(finLinea->getState() == NOT_PRESSED){
@@ -325,6 +321,8 @@ void mapeoSlider(Button * inicioLinea, Button * finLinea){
         }
         else{
             slider.maxPasos = (uint64_t)((-1)*(stepper.getStepCurr()));
+            Serial.println(slider.maxPasos);
+
             slider.maxPasos -= 200; 
             Serial.println(slider.maxPasos);
             delay(500);
@@ -347,11 +345,11 @@ void mapeoSlider(Button * inicioLinea, Button * finLinea){
             move_to_end = 1;
             stepper.setStepCurrent(0);
             stepper.setEnableMotor(OFF);
-            setState(STOPPED);
+            setState(READY);
+            show_one_time = true;
         }
     }    
     
-
 
 
 }
