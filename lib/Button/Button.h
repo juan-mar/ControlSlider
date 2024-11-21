@@ -20,9 +20,10 @@ typedef enum{
 }activeLogic_t;
 
 typedef enum{
-    PRESS,
-    PRESSED,
-    NOT_PRESSED
+    FLANCO_ACTIVACION,
+    PRESS,      //Activado
+    PRESSED,    //Flanco desactivacion
+    NOT_PRESSED //Desactivado
 }stateButtton_t;
 
 /*******************************************************************************

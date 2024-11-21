@@ -44,9 +44,9 @@ public:
     void setEnableMotor(int en);                            //Funcion para habilitar el motor
     void setDir(int dir);                                   //Funcion para cambiar la direccion
     void setMoreSteps(uint64_t steps);                      //Funcion para agregar pasos
-    void setSteps(uint64_t steps);                          //Funcion para setear pasos
+    void setStepsRem(uint64_t steps);                          //Funcion para setear pasos
     void setTimeConst(uint64_t time);                       //Funcion para setear la constante de tiempo
-    void setStepCurrent(uint64_t step);
+    void setStepCurrent(int64_t step);
 
     int getDir();
     bool getEnableMotor();                                  //Funcion para obtener la direccion
@@ -65,7 +65,7 @@ private:
     int enPin;
     int timeConst;
     int isEnableMotor;
-    uint64_t stepsCurrent;
+    int64_t stepsCurrent;
 
 };
 

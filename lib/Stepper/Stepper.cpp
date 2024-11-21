@@ -91,7 +91,7 @@ void Motor::setMoreSteps(uint64_t steps)
     stepsRemainig += steps;
 }
 
-void Motor::setSteps(uint64_t steps)
+void Motor::setStepsRem(uint64_t steps)
 {
     stepsRemainig = steps;
 }
@@ -102,7 +102,7 @@ void Motor::setTimeConst(uint64_t time)
 }   
 
 
-void Motor::setStepCurrent(uint64_t step)
+void Motor::setStepCurrent(int64_t step)
 {
     stepsCurrent = step;
 }

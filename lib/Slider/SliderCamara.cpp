@@ -264,7 +264,7 @@ bool getEnableMotor()
 
 void setStepRemaining(int step)
 {
-    stepper.setSteps(step);
+    stepper.setStepsRem(step);
 }
 
 uint64_t getStepRemaining()
@@ -290,4 +290,68 @@ int getMotorDir()
 uint64_t getX0(int tramo)
 {
     return slider.getX0(tramo);
+}
+
+
+//Mapeo de Slider
+
+void mapeoSlider(Button * inicioLinea, Button * finLinea){
+    static int move_to_end = 1;
+    static int move_to_start = 0;   
+    static int move_adelante = 0;
+    //Move to end
+    if(move_to_end){
+        if(finLinea->getState() == NOT_PRESSED){
+            stepper.setDir(ANTIHORARIO);
+            stepper.setEnableMotor(ON);
+            stepper.setTimeConst(MAX_VEL);
+            updateMotor();
+        }
+        else{
+            stepper.setStepCurrent(0);
+            delay(500);
+            move_to_end = 0;
+            move_to_start = 1;
+        }        
+    }
+
+    //Move to start
+    if(move_to_start){
+        if(inicioLinea->getState() == NOT_PRESSED){
+            stepper.setDir(HORARIO);
+            stepper.setEnableMotor(ON);
+            stepper.setTimeConst(MAX_VEL);
+            updateMotor();
+        }
+        else{
+            slider.maxPasos = (uint64_t)((-1)*(stepper.getStepCurr()));
+            slider.maxPasos -= 200; 
+            Serial.println(slider.maxPasos);
+            delay(500);
+            stepper.setStepsRem(100); 
+            move_adelante = 1;
+            move_to_start = 0;
+        }
+    }
+
+    //Move forward
+    if(move_adelante){
+        if(stepper.getStepsRemainig()){
+            stepper.setDir(ANTIHORARIO);
+            stepper.setEnableMotor(ON);
+            stepper.setTimeConst(MAX_VEL);
+            updateMotor();
+        }
+        else{
+            move_adelante = 0;
+            move_to_end = 1;
+            stepper.setStepCurrent(0);
+            stepper.setEnableMotor(OFF);
+            setState(STOPPED);
+        }
+    }    
+    
+
+
+
 }

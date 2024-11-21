@@ -66,6 +66,8 @@ void setup() {
     //Serial.println(getXf(getCurrentTramo()));
 
     //setMotorEnable(ON);
+    setMaxPasos(4000);
+
 
 }
 
@@ -75,7 +77,7 @@ void loop() {
     if(paradaEmergencia == false){ 
         if(!EG_isEmpty()){
             byte_t event = (byte_t)(EG_getEvent());
-            Serial.println(event);
+        //    Serial.println(event);
             state = fsm(state, event);
             state->actionState();
         }
@@ -104,6 +106,7 @@ void loop() {
         {
             runMotor();
             if (millis() - timer_3 > 200) {
+           //     disp_write_number(pasos2cm(getStepCurrent()), PROGRESS_COL, PROGRESS_FIL);
                 disp_write_number(getStepCurrent(), PROGRESS_COL, PROGRESS_FIL);
                 timer_3 = millis();
             }
@@ -115,9 +118,14 @@ void loop() {
                 updateMotor();
             }
             if (millis() - timer_3 > 50) {
+                //disp_write_number(pasos2cm(getStepCurrent()), DIS_OFFSET, DIS_FIL);
                 disp_write_number(getStepCurrent(), DIS_OFFSET, DIS_FIL);
                 timer_3 = millis();
             }
+        }
+        case MANUAL_MODE:
+        {
+            mapeoSlider(&inicioDeLinea, &finDeLinea);
         }
             break;
         default:
@@ -173,12 +181,12 @@ void readButtons(void){
 
 void rutinaEmergencia(){
     
-        if(emergencia.getState() == PRESS){
-            paradaEmergencia = false;
-            EG_addExternEvent(NONE);
-            setStepRemaining(0);
-        }
-    
+	if(emergencia.getState() == PRESS){
+		paradaEmergencia = false;
+		EG_addExternEvent(NONE);
+		setStepRemaining(0);
+	}
+
     
     if(!EG_isEmpty()){
         byte_t event = (byte_t)(EG_getEvent());

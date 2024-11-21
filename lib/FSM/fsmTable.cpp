@@ -466,8 +466,16 @@ static void nextPart(void){
 }
 
 static void increment_x(void) {	
-	setMotorDir(ANTIHORARIO);	//antihorario
-	setMoreSteps(STEP);
+	if(getMaxPasos() > getStepCurrent() + STEP){
+		setMotorDir(ANTIHORARIO);	//antihorario
+		setMoreSteps(STEP);	
+		Serial.println(getStepCurrent()+STEP);
+	}
+	else{
+		setStepRemaining(0);
+
+	}
+	
 }
 
 static void decrement_x(void) {	
@@ -586,6 +594,7 @@ static void pause_resume(void){
 
 static void finish(void){
 	setState(STOPPED);
+	setStepRemaining(0);
 	setMotorEnable(OFF);
 	show_menu();
 }

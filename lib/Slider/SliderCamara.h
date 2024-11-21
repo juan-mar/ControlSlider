@@ -18,7 +18,9 @@ enum states_slider{
     RUNNING,
     PAUSED,
     SETTING_MOTOR,
-    FINISHED
+    FINISHED,
+    MAP,
+    MANUAL_MODE
 };
 
 #define ADD     1
@@ -39,6 +41,10 @@ void modifyMovement(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo);  //Mo
 
 void modifyNumTramos(bool action);                                          //Modifica la cantidad de tramos
 
+int pasos2cm(uint64_t pasos);                                           //Convierte pasos a cm
+
+void mapeoSlider(Button * inicioLinea, Button * finLinea);
+
 //Getters
 int getCantTramos();                                                        //Devuelve la cantidad de tramos
 
@@ -56,8 +62,6 @@ uint64_t getMaxPasos();
 void setMaxPasos(uint64_t pasos);
 
 void setState(int estado);                                                  //Setea el flag de inicio de movimiento
-
-int pasos2cm(uint64_t pasos);                                           //Convierte pasos a cm
 
 
 //Funciones para Motor
