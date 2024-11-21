@@ -194,7 +194,8 @@ void runMotor()
         //Estoy en tramo current
         stepper.calcConstTime(slider.getX0(currentTramo), slider.getXf(currentTramo), 
                                         slider.getTiempo(currentTramo));
-
+        Serial.println("Tramo:");
+        Serial.println(currentTramo);
         Serial.println("Tramo1_x0");
         Serial.println(slider.getX0(currentTramo));
         Serial.println("Tramo1_xf");
@@ -216,15 +217,18 @@ void runMotor()
 
     if(stepper.getStepCurr() < slider.getXf(currentTramo) ){
         newTramo = 0;
+        updateMotor();
     }
     else{
-        //Estoy en tramo siguiente
+        //Tramo finalizado
         if(currentTramo < cantTramos-1){
+            //Si quedan tramos, sigo
             currentTramo++;
             newTramo = 1;
         }
         else{
-            setState(STOPPED);
+            //Si no quedan tramos, finalizo
+            setState(FINISHED);
             currentTramo = 0;
             newTramo = 1;
         }

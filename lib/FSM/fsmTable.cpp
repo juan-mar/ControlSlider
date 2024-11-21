@@ -433,8 +433,12 @@ static void show_set_parts(void) {
  ******************************************************************************/
 static void show_edit_dis(void) {
 	show_screen(DISTANCES_n, BLANK);
-	disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
-	//disp_write_number(getStepCurrent(), DIS_COL+5, DIS_FIL);
+	if(part_to_edit == getCantTramos()){
+		disp_write("f", DIS_COL+2, DIS_FIL);
+	}
+	else{
+		disp_write_number(part_to_edit, DIS_COL+2, DIS_FIL);
+	}
 }
 
 static void settingMotor(){
@@ -547,6 +551,7 @@ static void show_run(void) {
 	{
 	case PAUSED:
 		show_screen(RUN, RESUME_FINISH);
+		break;
 	case RUNNING:
 		show_screen(RUN, PAUSE_FINISH);	
 		break;

@@ -97,15 +97,12 @@ void loop() {
         case START:
         {
             move2origin(&inicioDeLinea);
-            
         }
             break;
         case RUNNING:
+        case FINISHED:
         {
             runMotor();
-            if (getStepCurrent() < getXf(getCurrentTramo())) {
-                updateMotor();
-            }
             if (millis() - timer_3 > 200) {
                 disp_write_number(getStepCurrent(), PROGRESS_COL, PROGRESS_FIL);
                 timer_3 = millis();
