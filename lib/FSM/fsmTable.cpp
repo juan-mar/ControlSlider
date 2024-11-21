@@ -559,23 +559,28 @@ static void show_run(void) {
 	{
 	case PAUSED:
 		show_screen(RUN, RESUME_FINISH);
+		show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
 		break;
 	case RUNNING:
-		show_screen(RUN, PAUSE_FINISH);	
+		show_screen(RUN, PAUSE_FINISH);
+		show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);	
 		break;
-	case START:
 	case SETTING_MOTOR:
 	case STOPPED:
 	case FINISHED:
-		/* code */
+	case NONE:
+		show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
+				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);		
 		break;
-	
+	case START:
+	break;
 	default:
 		show_screen(RUN, BLANK);	
 		break;
 	}
-	show_curs(currentStateItem->item[currentStateItem->item_selec].cursor_pos_col, 
-				currentStateItem->item[currentStateItem->item_selec].cursor_pos_fil);
+	
 	//disp_write_number(getCurrStep(), 0, 1);
 }
 
@@ -596,6 +601,13 @@ static void finish(void){
 	setState(STOPPED);
 	setStepRemaining(0);
 	setMotorEnable(OFF);
+	for (int i = 0; i < 5; i++){
+		times[i] = 0;
+	}
+	for (int i = 0; i < 6; i++){
+		points[i] = 0;
+	}
+	
 	show_menu();
 }
 

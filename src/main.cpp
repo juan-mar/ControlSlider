@@ -102,8 +102,8 @@ void loop() {
         {
             runMotor();
             if (millis() - timer_3 > 200) {
-           //     disp_write_number(pasos2cm(getStepCurrent()), PROGRESS_COL, PROGRESS_FIL);
-                disp_write_number(getStepCurrent(), PROGRESS_COL, PROGRESS_FIL);
+                disp_write_number(pasos2cmSlider(getStepCurrent()), PROGRESS_COL, PROGRESS_FIL);
+            //    disp_write_number(getStepCurrent(), PROGRESS_COL, PROGRESS_FIL);
                 timer_3 = millis();
             }
         } 
@@ -114,12 +114,12 @@ void loop() {
                 updateMotor();
             }
             if (millis() - timer_3 > 50) {
-                //disp_write_number(pasos2cm(getStepCurrent()), DIS_OFFSET, DIS_FIL);
-                disp_write_number(getStepCurrent(), DIS_OFFSET, DIS_FIL);
+                disp_write_number(pasos2cmSlider(getStepCurrent()), DIS_OFFSET, DIS_FIL);
+                //disp_write_number(getStepCurrent(), DIS_OFFSET, DIS_FIL);
                 timer_3 = millis();
             }
         }
-        break;
+            break;
         default:
             break;
     }
@@ -141,30 +141,33 @@ void readEncoder(void){
 }
 
 void readButtons(void){
-	if(encoderSwitch.getState() == PRESSED){
+	if(encoderSwitch.getState() == FLANCO_DESACTIVACION){
         EG_addExternEvent(ENCODER_SWITCH);
 	}
     
-    if(inicioDeLinea.getState() == FLANCO_ACTIVACION){	//Indica inicio de linea apretado
+    if(inicioDeLinea.getState() == FLANCO_DESACTIVACION){	//Indica inicio de linea apretado
         EG_addExternEvent(INIT_OF_LINE);
 	}	
-	if(finDeLinea.getState() == FLANCO_ACTIVACION){	//Indica fin de linea apretado
+	if(finDeLinea.getState() == FLANCO_DESACTIVACION){	//Indica fin de linea apretado
         EG_addExternEvent(END_OF_LINE);
 	}
     
-    if(emergencia.getState() == FLANCO_ACTIVACION && paradaManual == false && iniciando == false){
+    stateButtton_t estadoParada = emergencia.getState();
+    if(estadoParada == PRESS && paradaManual == false  && iniciando == false){
         paradaManual = true;
         setState(STOPPED);
         EG_addExternEvent(NONE);
+        //Serial.println("Manual");
     }
 
-    if(emergencia.getState() == PRESSED && paradaManual == true && iniciando == false){
+    if(estadoParada == FLANCO_DESACTIVACION && paradaManual == true && iniciando == false){
         //Evento de salida de modo manual.
         EG_addExternEvent(NONE);
         paradaManual = false;
         iniciando = true;
+        //Serial.println("Volviendo automatico");
     }
-    
+   // Serial.println(emergencia.getState());
 }
 
 void rutinaEmergencia(){
@@ -186,14 +189,18 @@ void rutinaEmergencia(){
             break;
         case ENCODER_LEFT:
             if(getEnableMotor() == ON){
-                setMotorDir(ANTIHORARIO);
-                setMoreSteps(50);
+                if(finDeLinea.getState() == NOT_PRESSED){
+                    setMotorDir(ANTIHORARIO);
+                    setMoreSteps(100);
+                }
             }
             break;
         case ENCODER_RIGHT:
             if(getEnableMotor() == ON){
-                setMotorDir(HORARIO);
-                setMoreSteps(50);
+                if(inicioDeLinea.getState() == NOT_PRESSED){
+                    setMotorDir(HORARIO);
+                    setMoreSteps(100);
+                }
             }
             break;
         case INIT_OF_LINE:
@@ -217,6 +224,8 @@ void rutinaEmergencia(){
             break;
         }
     }
+    if(getStepRemaining())
+        updateMotor();
 
 }
 

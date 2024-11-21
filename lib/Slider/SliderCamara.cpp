@@ -113,9 +113,9 @@ int getCurrentTramo()
     return currentTramo;
 }
 
-int pasos2cm(uint64_t pasos)
+int pasos2cmSlider(uint64_t pasos)
 {
-    int dist = pasos*75/slider.maxPasos;
+    int dist = (float)pasos*75.0/(float)slider.maxPasos;
     return dist;
 }
 
@@ -133,7 +133,7 @@ void move2origin(Button * inicioLinea)
         }
         if(inicioLinea-> getState()  == NOT_PRESSED){
             stepper.setTimeConst(1000/2);
-             stepper.setDir(HORARIO);
+            stepper.setDir(HORARIO);
             stepper.setEnableMotor(ON);
             updateMotor();
         }
@@ -188,7 +188,6 @@ void setTimeConst(uint64_t time)
 
 void runMotor()
 {
-    static int cantTramos = slider.numTramos;
     static int newTramo = 1;
     if(newTramo){   
         //Estoy en tramo current
@@ -210,7 +209,7 @@ void runMotor()
     }
     else{
         //Tramo finalizado
-        if(currentTramo < cantTramos-1){
+        if(currentTramo < slider.numTramos-1){
             //Si quedan tramos, sigo
             currentTramo++;
             newTramo = 1;
@@ -321,10 +320,10 @@ void mapeoSlider(Button * inicioLinea, Button * finLinea){
         }
         else{
             slider.maxPasos = (uint64_t)((-1)*(stepper.getStepCurr()));
-            Serial.println(slider.maxPasos);
+        //    Serial.println(slider.maxPasos);
 
             slider.maxPasos -= 200; 
-            Serial.println(slider.maxPasos);
+        //    Serial.println(slider.maxPasos);
             delay(500);
             stepper.setStepsRem(100); 
             move_adelante = 1;

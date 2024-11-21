@@ -41,7 +41,7 @@ void modifyMovement(int tramo, uint64_t x0, uint64_t xf, uint64_t tiempo);  //Mo
 
 void modifyNumTramos(bool action);                                          //Modifica la cantidad de tramos
 
-int pasos2cm(uint64_t pasos);                                           //Convierte pasos a cm
+int pasos2cmSlider(uint64_t pasos);                                           //Convierte pasos a cm
 
 void mapeoSlider(Button * inicioLinea, Button * finLinea);
 

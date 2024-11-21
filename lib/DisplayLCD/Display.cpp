@@ -99,6 +99,12 @@ void disp_write_number(int number, int pos_x, int pos_y)
     display.setCursor(pos_x, pos_y);
     display.print(number, 10); //base decimal
 }
+
+void disp_write_number_f(float number, int pos_x, int pos_y)
+{
+    display.setCursor(pos_x, pos_y);
+    display.print(number, 2); //base decimal
+}
 /*******************************************************************************
  *******************************************************************************
  LOCAL FUNCTION DEFINITIONS

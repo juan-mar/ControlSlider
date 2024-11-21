@@ -37,5 +37,7 @@ void disp_write(const char * word, int pos_x, int pos_y);
 
 void disp_write_number(int number, int pos_x, int pos_y);
 
+void disp_write_number_f(float number, int pos_x, int pos_y);
+
 
 #endif /* DISPLAY_H_ */

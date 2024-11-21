@@ -22,7 +22,7 @@ typedef enum{
 typedef enum{
     FLANCO_ACTIVACION,
     PRESS,      //Activado
-    PRESSED,    //Flanco desactivacion
+    FLANCO_DESACTIVACION,    //Flanco desactivacion
     NOT_PRESSED //Desactivado
 }stateButtton_t;
 
