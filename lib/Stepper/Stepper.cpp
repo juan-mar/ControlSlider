@@ -69,14 +69,11 @@ Motor::~Motor()
 
 void Motor::calcConstTime(int x_o, int x_f, float time)
 {
-
     stepsRemainig = abs(x_f - x_o);
-    speed = stepsRemainig/(time*1000);                     //me da en pasos por ms
     timeConst = (1000*1000 * time)/stepsRemainig;          //tiempo entre pasos en MICROS
     if(timeConst < MAX_VEL){
         timeConst = MAX_VEL;
     }
-
 }
 
 
