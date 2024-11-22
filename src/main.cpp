@@ -17,7 +17,7 @@ ESP32Encoder encoder;
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_LOW);
 Button inicioDeLinea = Button(PIN_START_LINE, ACT_HIGH);
 Button finDeLinea = Button(PIN_END_LINE, ACT_HIGH);
-Button emergencia = Button(PIN_EMERGENCIA, ACT_LOW);
+Button emergencia = Button(PIN_EMERGENCIA, ACT_HIGH);
 bool paradaManual = false;
 bool iniciando = true;
 
@@ -81,6 +81,7 @@ void loop() {
         if(getStateSlider() == READY){
             iniciando = false;
             EG_addExternEvent(NONE);
+            Serial.println("Listo");
         }
     }
 
@@ -157,7 +158,7 @@ void readButtons(void){
         paradaManual = true;
         setState(STOPPED);
         EG_addExternEvent(NONE);
-        //Serial.println("Manual");
+        Serial.println("Manual");
     }
 
     if(estadoParada == FLANCO_DESACTIVACION && paradaManual == true && iniciando == false){
@@ -165,7 +166,7 @@ void readButtons(void){
         EG_addExternEvent(NONE);
         paradaManual = false;
         iniciando = true;
-        //Serial.println("Volviendo automatico");
+        Serial.println("Volviendo automatico");
     }
    // Serial.println(emergencia.getState());
 }
