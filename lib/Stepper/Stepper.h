@@ -17,7 +17,7 @@
 
 #define MAX_PARTS   5
 
-#define MAX_VEL     1000
+#define MAX_VEL     500
 
  /*******************************************************************************
  * DEFINICION DE CONSTANTES

@@ -40,6 +40,7 @@ static int state;
 static int currentTramo;
 static int go_origin = 1;
 static int go_X0 = 0;
+static int newTramo = 1;
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS
@@ -113,6 +114,15 @@ int getCurrentTramo()
     return currentTramo;
 }
 
+void setCurrentTramo(int curr)
+{
+    currentTramo = curr;
+}
+
+void setNewTramo(int curr)
+{
+    newTramo = curr;
+}
 int pasos2cmSlider(uint64_t pasos)
 {
     int dist = (float)pasos*75.0/(float)slider.maxPasos;
@@ -188,7 +198,6 @@ void setTimeConst(uint64_t time)
 
 void runMotor()
 {
-    static int newTramo = 1;
     if(newTramo){   
         //Estoy en tramo current
         stepper.calcConstTime(slider.getX0(currentTramo), slider.getXf(currentTramo), 

@@ -73,7 +73,7 @@ void loop() {
     else if(iniciando == false){
         //codigo de emergencia
         rutinaEmergencia();   
-
+        
     }
     
     if(iniciando == true){
@@ -82,6 +82,8 @@ void loop() {
             iniciando = false;
             EG_addExternEvent(NONE);
             Serial.println("Listo");
+            state = FSM_GetInitState();
+            EG_addExternEvent(NONE);
         }
     }
 
@@ -158,7 +160,7 @@ void readButtons(void){
         paradaManual = true;
         setState(STOPPED);
         EG_addExternEvent(NONE);
-        Serial.println("Manual");
+    //    Serial.println("Manual");
     }
 
     if(estadoParada == FLANCO_DESACTIVACION && paradaManual == true && iniciando == false){
@@ -166,7 +168,7 @@ void readButtons(void){
         EG_addExternEvent(NONE);
         paradaManual = false;
         iniciando = true;
-        Serial.println("Volviendo automatico");
+    //    Serial.println("Volviendo automatico");
     }
    // Serial.println(emergencia.getState());
 }

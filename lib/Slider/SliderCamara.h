@@ -63,6 +63,8 @@ void setMaxPasos(uint64_t pasos);
 
 void setState(int estado);                                                  //Setea el flag de inicio de movimiento
 
+void setCurrentTramo(int curr);
+void setNewTramo(int curr);
 
 //Funciones para Motor
 void move2origin(Button * inicioLinea);                                     //Mueve el motor a x0

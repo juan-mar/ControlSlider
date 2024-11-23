@@ -158,7 +158,8 @@ state_edge_t menu[] = {
 
 	//Eventos de transiscion 
 	{RUN_, run, run_slider, show_run},
-	{SETTING, settings, show_settings, show_settings},
+	{SETTING, set_manually, show_set_manually, show_set_manually},
+
 
     {NONE, menu, do_nothing, show_menu}
 };
@@ -198,7 +199,7 @@ state_edge_t set_manually[] = {
 	{SET_PARTS, set_parts, do_nothing, show_set_parts},
 	{ADD_PART, set_manually, add_part, show_set_manually},
 	{DELETE_PART, set_manually, delete_part, show_set_manually},
-	{BACK, settings, show_settings, show_settings},
+	{BACK, menu, show_menu, show_menu},
 	{NONE, set_manually, do_nothing, show_set_manually}
 };
 
@@ -256,8 +257,8 @@ state_edge_t run[] = {
     {ENCODER_LEFT, run, prevItem, show_run},
 	{ENCODER_SWITCH, run, selectItem, show_run},
     
-	{INIT_OF_LINE, run, do_nothing, show_run},
-    {END_OF_LINE, run, do_nothing, show_run},
+	{INIT_OF_LINE, run, stop_ini_x, show_run},
+    {END_OF_LINE, run, stop_fin_x, show_run},
 
 	//Eventos de transiscion
 	{PAUSE_RESUME, run, pause_resume, show_run},
@@ -586,6 +587,8 @@ static void show_run(void) {
 
 static void restart(void){
 	setState(START);
+	setCurrentTramo(0);
+	setNewTramo(1);
 }
 
 static void pause_resume(void){
@@ -599,6 +602,8 @@ static void pause_resume(void){
 
 static void finish(void){
 	setState(STOPPED);
+	setNewTramo(1);
+	setCurrentTramo(0);
 	setStepRemaining(0);
 	setMotorEnable(OFF);
 	for (int i = 0; i < 5; i++){
@@ -613,6 +618,8 @@ static void finish(void){
 
 static void run_slider(void){
 	setState(START);
+	setCurrentTramo(0);
+	setNewTramo(1);	
 	setMotorEnable(ON);	
 
 }
