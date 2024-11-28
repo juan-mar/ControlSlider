@@ -12,6 +12,8 @@
 #include "slider.h"
 #include "SliderCamara.h"
 
+//Version Funcional presentado 22-11-2024
+
 //sensores 
 ESP32Encoder encoder;
 Button encoderSwitch = Button(PIN_ENCODER_SW, ACT_LOW);
